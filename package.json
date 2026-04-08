@@ -4,6 +4,6 @@
   "description": "Audit Recipe — Internal Audit Platform by Worrkly",
   "private": true,
   "engines": {
-    "node": "18.x"
+        "node": "20.x"
   }
 }

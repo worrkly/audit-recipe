@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Audit Recipe — Internal Audit Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fustat:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#F9F9F8;--card:#FFFFFF;--ink:#0C0C0C;--ink2:#3A3A3A;--ink3:#7A7A7A;--ink4:#C0C0C0;--border:rgba(0,0,0,0.07);--borderMd:rgba(0,0,0,0.11);--blue:#0057FF;--blueDim:rgba(0,87,255,0.06);--green:#1A9E5C;--greenDim:rgba(26,158,92,0.07);--red:#D94040;--r:10px;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;}
+    body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.022;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+    header{border-bottom:1px solid var(--border);background:rgba(249,249,248,0.92);backdrop-filter:blur(24px);position:sticky;top:0;z-index:200;}
+    nav{max-width:1100px;margin:0 auto;padding:0 44px;display:flex;align-items:center;height:58px;gap:8px;}
+    .nav-logo{font-family:'Fustat',sans-serif;font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-0.5px;text-decoration:none;display:flex;align-items:center;gap:9px;margin-right:auto;}
+    .logo-icon{width:28px;height:28px;border-radius:7px;background:var(--ink);display:flex;align-items:center;justify-content:center;}
+    .logo-icon svg{width:14px;height:14px;}
+    .nav-link{font-size:13px;color:var(--ink3);text-decoration:none;padding:6px 12px;border-radius:7px;transition:all .15s;}
+    .nav-link:hover{background:rgba(0,0,0,0.04);color:var(--ink);}
+
+    main{max-width:900px;margin:0 auto;padding:80px 24px 100px;}
+
+    /* HERO */
+    .hero{text-align:center;margin-bottom:64px;animation:fadeUp .6s .05s cubic-bezier(.22,1,.36,1) both;}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px 5px 9px;background:var(--greenDim);border:1px solid rgba(26,158,92,0.2);border-radius:100px;margin-bottom:20px;}
+    .hero-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;}
+    .hero-badge span{font-size:12px;font-weight:500;color:var(--green);}
+    .hero h1{font-family:'Fustat',sans-serif;font-size:clamp(38px,6vw,58px);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:16px;}
+    .hero p{font-size:16px;color:var(--ink3);font-weight:300;line-height:1.7;max-width:500px;margin:0 auto 32px;}
+    .hero-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+    .btn-dark{display:inline-flex;align-items:center;gap:7px;padding:11px 24px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;font-weight:500;text-decoration:none;transition:opacity .15s,transform .2s;}
+    .btn-dark:hover{opacity:.85;transform:translateY(-1px);}
+    .btn-outline{display:inline-flex;align-items:center;gap:7px;padding:11px 24px;border-radius:9px;border:1px solid var(--borderMd);color:var(--ink2);font-size:14px;font-weight:400;text-decoration:none;transition:all .15s;}
+    .btn-outline:hover{background:rgba(0,0,0,0.04);color:var(--ink);}
+
+    /* TOOLS GRID */
+    .tools-label{font-size:11px;font-weight:700;color:var(--ink4);letter-spacing:.12em;text-transform:uppercase;text-align:center;margin-bottom:20px;}
+    .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:64px;animation:fadeUp .6s .15s cubic-bezier(.22,1,.36,1) both;}
+    .tool-card{background:var(--card);border:1px solid var(--borderMd);border-radius:14px;padding:28px;text-decoration:none;color:inherit;transition:all .2s;display:block;position:relative;overflow:hidden;}
+    .tool-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.08);transform:translateY(-2px);border-color:rgba(0,0,0,0.16);}
+    .tool-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+    .tool-icon svg{width:20px;height:20px;}
+    .tool-tag{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+    .tool-name{font-family:'Fustat',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.8px;margin-bottom:8px;}
+    .tool-desc{font-size:13.5px;color:var(--ink3);font-weight:300;line-height:1.65;}
+    .tool-arrow{position:absolute;bottom:22px;right:22px;width:28px;height:28px;border-radius:7px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+    .tool-card:hover .tool-arrow{background:var(--ink);border-color:var(--ink);}
+    .tool-card:hover .tool-arrow svg{stroke:white;}
+    .tool-arrow svg{width:12px;height:12px;stroke:var(--ink4);}
+
+    /* FEATURES */
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;animation:fadeUp .6s .25s cubic-bezier(.22,1,.36,1) both;}
+    .feat{padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--card);}
+    .feat-icon{font-size:20px;margin-bottom:10px;}
+    .feat-title{font-size:13px;font-weight:600;margin-bottom:4px;}
+    .feat-desc{font-size:12.5px;color:var(--ink3);font-weight:300;line-height:1.6;}
+
+    footer{border-top:1px solid var(--border);padding:20px 44px;text-align:center;}
+    footer p{font-size:12px;color:var(--ink4);}
+    @media(max-width:700px){.tools-grid{grid-template-columns:1fr;}.features-grid{grid-template-columns:1fr 1fr;}nav{padding:0 20px;}main{padding:56px 16px 80px;}footer{padding:20px;}}
+    @media(max-width:480px){.features-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<header>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M2 10.5L5.5 5L8 8.5L10.5 5.5L13 10.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      Audit Recipe
+    </a>
+    <a href="finding-builder.html" class="nav-link">Finding Builder</a>
+    <a href="report-builder.html" class="nav-link">Report Builder</a>
+    <a href="compliance-analyzer.html" class="nav-link">Compliance Analyzer</a>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="hero-badge"><span class="hero-dot"></span><span>Free · IIA Standard · Board Ready</span></div>
+    <h1>The audit platform<br/>built for auditors.</h1>
+    <p>Generate professional audit observations and build complete audit reports — in minutes, not hours.</p>
+    <div class="hero-actions">
+      <a href="finding-builder.html" class="btn-dark">Start with Finding Builder →</a>
+      <a href="report-builder.html" class="btn-outline">Build a Report</a>
+    </div>
+  </div>
+
+  <div class="tools-label">Three tools, one platform</div>
+  <div class="tools-grid">
+    <a href="finding-builder.html" class="tool-card">
+      <div class="tool-icon" style="background:rgba(26,158,92,0.08);">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12M4 6h8M4 14h6" stroke="#1A9E5C" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div class="tool-tag" style="color:var(--green);">Finding Builder</div>
+      <div class="tool-name">Observation<br/>Generator</div>
+      <div class="tool-desc">Describe your finding. Get a full IIA-structured audit observation with risks, root cause, and action plans in seconds.</div>
+      <div class="tool-arrow"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5H9.5M7 4L9.5 6.5L7 9" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </a>
+    <a href="report-builder.html" class="tool-card">
+      <div class="tool-icon" style="background:var(--blueDim);">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="#0057FF" stroke-width="1.6"/><path d="M7 7h6M7 10h6M7 13h4" stroke="#0057FF" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="tool-tag" style="color:var(--blue);">Report Builder</div>
+      <div class="tool-name">Audit Report<br/>Builder</div>
+      <div class="tool-desc">Build a complete audit report — executive summary, findings summary, and detailed findings — exported as a Word document.</div>
+      <div class="tool-arrow"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5H9.5M7 4L9.5 6.5L7 9" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </a>
+      <a href="compliance-analyzer.html" class="tool-card">
+      <div class="tool-icon" style="background:rgba(107,33,168,0.06);">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M4 5h12M4 8h8M4 11h10M4 14h6" stroke="#6B21A8" stroke-width="1.6" stroke-linecap="round"/><circle cx="16" cy="14" r="3" stroke="#6B21A8" stroke-width="1.4"/><path d="M15 14l.8.8 1.5-1.5" stroke="#6B21A8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="tool-tag" style="color:#6B21A8;">Compliance Analyzer</div>
+      <div class="tool-name">Policy & Regulation<br/>Compliance Analyzer</div>
+      <div class="tool-desc">Upload your internal policy and the regulation. AI maps every requirement, flags what's covered or missing, and recommends exactly what to fix.</div>
+      <div class="tool-arrow"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5H9.5M7 4L9.5 6.5L7 9" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </a>
+  </div>
+
+  <div class="features-grid">
+    <div class="feat"><div class="feat-icon">⚡</div><div class="feat-title">IIA Standard</div><div class="feat-desc">Every observation and report follows IIA International Standards for internal auditing.</div></div>
+    <div class="feat"><div class="feat-icon">📋</div><div class="feat-title">Board Ready</div><div class="feat-desc">Reports match the format your board and audit committee expect — from cover page to findings.</div></div>
+    <div class="feat"><div class="feat-icon">🔗</div><div class="feat-title">Connected</div><div class="feat-desc">Pull findings from Finding Builder directly into your report with one click.</div></div>
+    <div class="feat"><div class="feat-icon">📄</div><div class="feat-title">Word Export</div><div class="feat-desc">Export any observation or full report as a Word document — ready to share immediately.</div></div>
+    <div class="feat"><div class="feat-icon">🛡️</div><div class="feat-title">AI Validated</div><div class="feat-desc">Claude validates your input before generating — no garbage in, no garbage out.</div></div>
+    <div class="feat"><div class="feat-icon">🆓</div><div class="feat-title">Free to Use</div><div class="feat-desc">5 generations per week, completely free. No login required.</div></div>
+  </div>
+</main>
+
+<footer><p>© 2026 Worrkly · Audit Recipe · Internal Audit Platform</p></footer>
+</body>
+</html>

@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Audit Recipe — Report Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fustat:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#F9F9F8;--card:#FFFFFF;--ink:#0C0C0C;--ink2:#3A3A3A;--ink3:#7A7A7A;--ink4:#C0C0C0;--border:rgba(0,0,0,0.07);--borderMd:rgba(0,0,0,0.11);--blue:#0057FF;--blueDim:rgba(0,87,255,0.06);--green:#1A9E5C;--greenDim:rgba(26,158,92,0.07);--red:#D94040;--redDim:rgba(217,64,64,0.06);--amber:#C98A00;--amberDim:rgba(201,138,0,0.06);--purple:#6B21A8;--teal:#0E7490;--gold:#B8860B;--r:10px;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;}
+    body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.022;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* NAV */
+    header{position:sticky;top:0;z-index:200;background:rgba(249,249,248,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+    nav{max-width:1100px;margin:0 auto;padding:0 44px;display:flex;align-items:center;height:58px;gap:8px;}
+    .nav-logo{font-family:'Fustat',sans-serif;font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-0.5px;text-decoration:none;display:flex;align-items:center;gap:9px;margin-right:auto;}
+    .logo-icon{width:28px;height:28px;border-radius:7px;background:var(--ink);display:flex;align-items:center;justify-content:center;}
+    .logo-icon svg{width:14px;height:14px;}
+    .nav-link{font-size:13px;color:var(--ink3);text-decoration:none;padding:6px 12px;border-radius:7px;transition:all .15s;border:none;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .nav-link:hover{background:rgba(0,0,0,0.04);color:var(--ink);}
+    .nav-link.active{color:var(--blue);font-weight:500;}
+    .nav-pill{font-size:11px;font-weight:500;color:var(--ink4);padding:3px 10px;border:1px solid var(--borderMd);border-radius:100px;}
+
+    /* LAYOUT */
+    .wrap{max-width:820px;margin:0 auto;padding:52px 24px 100px;}
+
+    /* HERO */
+    .hero{margin-bottom:40px;animation:fadeUp .6s .05s cubic-bezier(.22,1,.36,1) both;}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px 4px 8px;background:var(--blueDim);border:1px solid rgba(0,87,255,0.18);border-radius:100px;margin-bottom:16px;}
+    .hero-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);display:inline-block;}
+    .hero-badge span{font-size:11.5px;font-weight:500;color:var(--blue);}
+    .hero h1{font-family:'Fustat',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1.5px;line-height:1.08;margin-bottom:10px;}
+    .hero p{font-size:15px;color:var(--ink3);font-weight:300;line-height:1.65;max-width:520px;}
+
+    /* STEP CARD */
+    .step-card{background:var(--card);border:1px solid var(--borderMd);border-radius:14px;padding:28px;margin-bottom:16px;box-shadow:0 2px 16px rgba(0,0,0,0.04);animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both;}
+    .step-header{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+    .step-num{width:26px;height:26px;border-radius:7px;background:var(--ink);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .step-title{font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;}
+    .step-sub{font-size:12px;color:var(--ink4);font-weight:300;margin-left:auto;}
+
+    /* FORM */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+    .form-group{margin-bottom:14px;}
+    .form-group.full{grid-column:1/-1;}
+    .form-label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+    label{font-size:12px;font-weight:500;color:var(--ink3);}
+    .label-opt{font-size:11px;color:var(--ink4);font-weight:300;}
+    input[type="text"],input[type="date"],textarea,select{width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--borderMd);border-radius:var(--r);color:var(--ink);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s,box-shadow .15s;}
+    textarea{resize:vertical;min-height:80px;line-height:1.7;}
+    input:focus,textarea:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,87,255,0.08);}
+    input::placeholder,textarea::placeholder{color:var(--ink4);}
+
+    /* RATING PILLS */
+    .rating-pills{display:flex;gap:7px;flex-wrap:wrap;}
+    .rating-pill{padding:7px 18px;border-radius:8px;border:1px solid var(--borderMd);background:var(--bg);color:var(--ink3);font-size:13px;font-weight:400;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;}
+    .rating-pill:hover{border-color:rgba(0,0,0,0.22);color:var(--ink);}
+    .rating-pill.sel-strong{border-color:var(--green);background:var(--greenDim);color:var(--green);font-weight:600;}
+    .rating-pill.sel-satisfactory{border-color:var(--blue);background:var(--blueDim);color:var(--blue);font-weight:600;}
+    .rating-pill.sel-needs{border-color:var(--amber);background:var(--amberDim);color:var(--amber);font-weight:600;}
+    .rating-pill.sel-unsatisfactory{border-color:var(--red);background:var(--redDim);color:var(--red);font-weight:600;}
+
+    /* FINDINGS PANEL */
+    .findings-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+    .btn-sm{padding:7px 14px;border-radius:8px;border:1px solid var(--borderMd);background:transparent;color:var(--ink3);font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;}
+    .btn-sm:hover{background:rgba(0,0,0,0.04);color:var(--ink);}
+    .btn-sm svg{width:12px;height:12px;flex-shrink:0;}
+    .btn-sm.primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+    .btn-sm.primary:hover{opacity:.85;}
+
+    /* FINDING ITEM */
+    .finding-item{background:var(--bg);border:1px solid var(--borderMd);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;cursor:grab;}
+    .finding-item:active{cursor:grabbing;}
+    .finding-drag{color:var(--ink4);font-size:14px;margin-top:1px;flex-shrink:0;cursor:grab;}
+    .finding-body{flex:1;min-width:0;}
+    .finding-title{font-size:13.5px;font-weight:500;color:var(--ink);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .finding-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .risk-chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;font-family:'DM Mono',monospace;}
+    .finding-actions{display:flex;gap:4px;flex-shrink:0;}
+    .icon-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+    .icon-btn:hover{background:rgba(0,0,0,0.05);}
+    .icon-btn svg{width:12px;height:12px;color:var(--ink3);}
+    .icon-btn.del:hover{background:var(--redDim);border-color:rgba(217,64,64,0.3);}
+    .icon-btn.del:hover svg{color:var(--red);}
+
+    /* FINDING FORM (modal-style inline) */
+    .finding-form-wrap{display:none;background:rgba(0,87,255,0.03);border:1px solid rgba(0,87,255,0.14);border-radius:12px;padding:20px;margin-bottom:12px;}
+    .finding-form-wrap.open{display:block;}
+    .finding-form-title{font-size:12px;font-weight:700;color:var(--blue);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;}
+
+    /* HISTORY PICKER */
+    .history-picker{display:none;background:var(--bg);border:1px solid var(--borderMd);border-radius:10px;padding:14px;margin-bottom:12px;max-height:280px;overflow-y:auto;}
+    .history-picker.open{display:block;}
+    .history-pick-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--border);}
+    .history-pick-item:last-child{border-bottom:none;}
+    .history-pick-item:hover{background:rgba(0,87,255,0.04);}
+    .history-pick-title{font-size:13px;color:var(--ink);font-weight:400;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .history-pick-date{font-size:11px;color:var(--ink4);font-family:'DM Mono',monospace;flex-shrink:0;}
+
+    /* EMPTY STATE */
+    .empty-findings{text-align:center;padding:36px 24px;border:2px dashed var(--borderMd);border-radius:12px;color:var(--ink4);}
+    .empty-findings svg{width:32px;height:32px;margin-bottom:10px;opacity:.4;}
+    .empty-findings p{font-size:13px;}
+
+    /* GENERATE / EXPORT */
+    .actions-bar{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;}
+    .btn-generate{flex:1;min-width:200px;padding:13px;border-radius:var(--r);border:none;background:var(--ink);color:#fff;font-size:15px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity .15s,transform .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-generate:hover:not(:disabled){opacity:.85;transform:translateY(-1px);}
+    .btn-generate:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-export-word{padding:13px 22px;border-radius:var(--r);border:1px solid var(--borderMd);background:transparent;color:var(--ink2);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;}
+    .btn-export-word:hover:not(:disabled){background:var(--ink);color:#fff;border-color:var(--ink);}
+    .btn-export-word:disabled{opacity:.4;cursor:not-allowed;}
+    .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+
+    /* ERROR */
+    .error-box{display:none;padding:10px 13px;border-radius:8px;margin-bottom:14px;background:var(--redDim);border:1px solid rgba(217,64,64,0.2);color:var(--red);font-size:13px;}
+
+    /* PREVIEW */
+    #preview-wrap{display:none;margin-top:28px;}
+    .preview-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .preview-title{font-family:'Fustat',sans-serif;font-size:18px;font-weight:800;letter-spacing:-.5px;}
+    .preview-card{background:var(--card);border:1px solid var(--borderMd);border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
+
+    /* REPORT PREVIEW SECTIONS */
+    .rp-cover{padding:48px 36px 36px;border-bottom:3px solid var(--ink);text-align:center;}
+    .rp-cover-label{font-size:12px;font-weight:500;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+    .rp-cover-title{font-family:'Fustat',sans-serif;font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;}
+    .rp-cover-date{font-size:14px;color:var(--ink3);margin-bottom:28px;}
+    .rp-cover-table{width:100%;max-width:360px;margin:0 auto;border-collapse:collapse;}
+    .rp-cover-table td{padding:8px 12px;border:1px solid var(--borderMd);font-size:13px;}
+    .rp-cover-table td:first-child{font-weight:600;background:rgba(0,0,0,0.02);width:130px;}
+    .rp-confidential{margin-top:24px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);}
+
+    .rp-section{padding:28px 36px;border-bottom:1px solid var(--border);}
+    .rp-section:last-child{border-bottom:none;}
+    .rp-section-title{font-family:'Fustat',sans-serif;font-size:15px;font-weight:800;letter-spacing:-.3px;color:var(--ink);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+    .rp-text{font-size:13.5px;line-height:1.8;color:var(--ink2);font-weight:300;}
+
+    /* RATING TABLE */
+    .rating-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+    .rating-table th,.rating-table td{padding:8px 14px;border:1px solid var(--borderMd);font-size:13px;text-align:center;}
+    .rating-table th{font-weight:600;background:rgba(0,0,0,0.03);}
+    .rating-cell{font-weight:700;padding:6px 20px;border-radius:4px;display:inline-block;font-size:13px;}
+
+    /* FINDINGS SUMMARY TABLE */
+    .summary-table{width:100%;border-collapse:collapse;margin-bottom:20px;}
+    .summary-table th,.summary-table td{padding:9px 14px;border:1px solid var(--borderMd);font-size:13px;}
+    .summary-table th{font-weight:600;background:rgba(0,0,0,0.03);text-align:center;}
+    .summary-table td:first-child{text-align:center;font-weight:600;font-family:'DM Mono',monospace;}
+
+    /* FINDING DETAIL CARD */
+    .finding-detail{border:1px solid var(--borderMd);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+    .finding-detail-header{display:grid;grid-template-columns:1fr 180px;gap:0;}
+    .finding-detail-name{padding:12px 16px;font-weight:700;font-size:14px;border-right:1px solid var(--borderMd);}
+    .finding-detail-meta{padding:8px 14px;display:flex;flex-direction:column;gap:3px;font-size:11.5px;}
+    .finding-detail-body{padding:14px 16px;border-top:1px solid var(--borderMd);font-size:13.5px;line-height:1.8;color:var(--ink2);font-weight:300;}
+    .finding-detail-row{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--borderMd);}
+    .finding-detail-cell{padding:10px 16px;font-size:13px;}
+    .finding-detail-cell:first-child{border-right:1px solid var(--borderMd);}
+    .finding-detail-cell-label{font-weight:600;font-size:11px;margin-bottom:4px;}
+    .action-plan-row{display:grid;grid-template-columns:1fr 160px;border-top:1px solid var(--borderMd);}
+    .action-plan-cell{padding:12px 16px;font-size:13px;}
+    .action-plan-cell:first-child{border-right:1px solid var(--borderMd);}
+
+    footer{border-top:1px solid var(--border);padding:20px 44px;text-align:center;}
+    footer p{font-size:12px;color:var(--ink4);}
+    @media(max-width:700px){.wrap{padding:36px 16px 80px;}.form-grid,.form-grid.three{grid-template-columns:1fr;}nav{padding:0 20px;}footer{padding:20px;}.rp-section{padding:20px;}.rp-cover{padding:32px 20px 24px;}}
+  </style>
+</head>
+<body>
+
+
+<!-- NAV -->
+<header>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M2 10.5L5.5 5L8 8.5L10.5 5.5L13 10.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      Audit Recipe
+    </a>
+    <a href="finding-builder.html" class="nav-link">Finding Builder</a>
+    <a href="report-builder.html" class="nav-link active">Report Builder</a>
+    <a href="compliance-analyzer.html" class="nav-link">Compliance Analyzer</a>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge"><span class="hero-dot"></span><span>Report Builder · IIA Standard</span></div>
+    <h1>Build your audit<br/>report.</h1>
+    <p>Fill in the details, add your findings, and export a complete professional audit report — ready for the board.</p>
+  </div>
+
+  <!-- STEP 1: Report Header -->
+  <div class="step-card" style="animation-delay:.08s">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <span class="step-title">Report Header</span>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Organisation / Bank Name *</label>
+        <input type="text" id="org-name" placeholder="e.g. Saudi Investment Bank"/>
+      </div>
+      <div class="form-group">
+        <label>Report Title *</label>
+        <input type="text" id="report-title" placeholder="e.g. Audit of Compensation Practices"/>
+      </div>
+      <div class="form-group">
+        <label>Report Reference</label>
+        <input type="text" id="report-ref" placeholder="e.g. 25-IAR-RCF-04"/>
+      </div>
+      <div class="form-group">
+        <label>Report Date *</label>
+        <input type="text" id="report-date" placeholder="e.g. April 2026"/>
+      </div>
+      <div class="form-group">
+        <label>Audit Period</label>
+        <input type="text" id="audit-period" placeholder="e.g. January – December 2025"/>
+      </div>
+      <div class="form-group">
+        <label>Prepared By</label>
+        <input type="text" id="prepared-by" placeholder="e.g. Internal Audit Group"/>
+      </div>
+      <div class="form-group">
+        <label>Reviewed By</label>
+        <input type="text" id="reviewed-by" placeholder="e.g. Senior Audit Manager"/>
+      </div>
+      <div class="form-group">
+        <label>Issued By</label>
+        <input type="text" id="issued-by" placeholder="e.g. Chief Audit Executive"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Audit Rating -->
+  <div class="step-card" style="animation-delay:.12s">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <span class="step-title">Overall Audit Rating</span>
+    </div>
+    <div class="form-group" style="margin-bottom:18px;">
+      <label style="display:block;margin-bottom:10px;">Current Audit Rating *</label>
+      <div class="rating-pills">
+        <button class="rating-pill" data-rating="Strong" onclick="selectRating(this,'current')">Strong</button>
+        <button class="rating-pill" data-rating="Satisfactory" onclick="selectRating(this,'current')">Satisfactory</button>
+        <button class="rating-pill" data-rating="Needs Improvement" onclick="selectRating(this,'needs')">Needs Improvement</button>
+        <button class="rating-pill" data-rating="Unsatisfactory" onclick="selectRating(this,'unsatisfactory')">Unsatisfactory</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label style="display:block;margin-bottom:10px;">Previous Audit Rating <span class="label-opt">(optional)</span></label>
+      <div class="rating-pills" id="prev-pills">
+        <button class="rating-pill" data-rating="Strong" onclick="selectRating(this,'current','prev')">Strong</button>
+        <button class="rating-pill" data-rating="Satisfactory" onclick="selectRating(this,'satisfactory','prev')">Satisfactory</button>
+        <button class="rating-pill" data-rating="Needs Improvement" onclick="selectRating(this,'needs','prev')">Needs Improvement</button>
+        <button class="rating-pill" data-rating="Unsatisfactory" onclick="selectRating(this,'unsatisfactory','prev')">Unsatisfactory</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Audit Details -->
+  <div class="step-card" style="animation-delay:.16s">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <span class="step-title">Audit Details</span>
+      <span class="step-sub">AI will expand your notes into full paragraphs</span>
+    </div>
+
+    <!-- Audit Objective -->
+    <div class="form-group">
+      <div class="form-label-row">
+        <label>Audit Objective — key points *</label>
+        <span class="label-opt">AI generates the full paragraph</span>
+      </div>
+      <textarea id="audit-objective-input" rows="3" placeholder="e.g. Evaluate governance and controls over compensation practices. Assess compliance with SAMA regulations. Review bonus payment process, DoA, and data extraction controls."></textarea>
+      <div id="objective-preview" style="display:none;margin-top:10px;padding:14px;background:rgba(0,87,255,0.03);border:1px solid rgba(0,87,255,0.14);border-radius:9px;">
+        <div style="font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span>✦ AI Generated — Audit Objective</span>
+          <button onclick="clearGenerated('objective')" style="font-size:10px;color:var(--ink4);background:none;border:none;cursor:pointer;font-family:DM Sans,sans-serif;">✕ Clear</button>
+        </div>
+        <div id="objective-text" style="font-size:13.5px;line-height:1.8;color:var(--ink2);font-weight:300;"></div>
+      </div>
+    </div>
+
+    <!-- Scope -->
+    <div class="form-group">
+      <div class="form-label-row">
+        <label>Scope & Coverage — key points *</label>
+        <span class="label-opt">AI generates the full paragraph</span>
+      </div>
+      <textarea id="audit-scope-input" rows="3" placeholder="e.g. Audit conducted Jan–Mar 2025. Part of 2025 internal audit plan. Coverage period 2024. Covered HR Rewards unit, Finance dept, Operations. 11 weeks fieldwork."></textarea>
+      <div id="scope-preview" style="display:none;margin-top:10px;padding:14px;background:rgba(0,87,255,0.03);border:1px solid rgba(0,87,255,0.14);border-radius:9px;">
+        <div style="font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span>✦ AI Generated — Scope & Coverage</span>
+          <button onclick="clearGenerated('scope')" style="font-size:10px;color:var(--ink4);background:none;border:none;cursor:pointer;font-family:DM Sans,sans-serif;">✕ Clear</button>
+        </div>
+        <div id="scope-text" style="font-size:13.5px;line-height:1.8;color:var(--ink2);font-weight:300;"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Audit Disclaimer</label>
+      <textarea id="audit-disclaimer" rows="3">Our opinion is based on the records and information provided by the Management and/or received from other independent sources. Our opinion provides a reasonable level of assurance as we are reviewing the processes and controls using the audit sampling approach. All the audits are conducted with due professional care and in conformance with the International Standards for the Professional Practice of Internal Auditing. However, Internal Audit does not give any absolute assurance of the infallibility of processes and controls.</textarea>
+    </div>
+  </div>
+
+  <!-- STEP 4: Findings -->
+  <div class="step-card" style="animation-delay:.20s">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <span class="step-title">Audit Findings</span>
+      <span class="step-sub" id="findings-count">0 findings added</span>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="findings-toolbar">
+      <button class="btn-sm primary" onclick="toggleFindingForm()">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Add Finding Manually
+      </button>
+      <button class="btn-sm" onclick="toggleHistoryPicker()">
+        <svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5V6l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Pull from History
+      </button>
+    </div>
+
+    <!-- History picker -->
+    <div class="history-picker" id="history-picker">
+      <div id="history-picker-list"></div>
+    </div>
+
+    <!-- Manual finding form -->
+    <div class="finding-form-wrap" id="finding-form">
+      <div class="finding-form-title">New Finding</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Finding Title *</label>
+          <input type="text" id="f-title" placeholder="e.g. Access to Compensation GL Accounts"/>
+        </div>
+        <div class="form-group">
+          <label>Tracking Number</label>
+          <input type="text" id="f-tracking" placeholder="e.g. 25-IAR-RCF-04-01"/>
+        </div>
+        <div class="form-group full">
+          <label>Finding Summary *</label>
+          <textarea id="f-summary" rows="3" placeholder="Describe the finding, what control failed, why it matters..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Specific Issue / Evidence</label>
+          <textarea id="f-specific" rows="2" placeholder="Specific details, names, dates, references..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Root Cause</label>
+          <textarea id="f-rootcause" rows="2" placeholder="Systemic reason this issue occurred..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Risk Level *</label>
+          <select id="f-risk">
+            <option value="">Select risk level</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Repeat Status</label>
+          <select id="f-repeat">
+            <option value="Not Repeated">Not Repeated</option>
+            <option value="Repeated">Repeated</option>
+            <option value="Partially Repeated">Partially Repeated</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Policy / Regulation Reference</label>
+          <input type="text" id="f-ref" placeholder="e.g. SAMA Regulation Art. 9"/>
+        </div>
+        <div class="form-group">
+          <label>Management Response</label>
+          <select id="f-mgmt-response">
+            <option value="Discussed and Agreed">Discussed and Agreed</option>
+            <option value="Accepted">Accepted</option>
+            <option value="Partially Accepted">Partially Accepted</option>
+            <option value="Not Accepted">Not Accepted</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Management Action Plan</label>
+          <textarea id="f-action" rows="2" placeholder="What action will be taken to remediate this finding..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Action Owner</label>
+          <input type="text" id="f-owner" placeholder="e.g. Chief Human Resources Officer"/>
+        </div>
+        <div class="form-group">
+          <label>Target Date</label>
+          <input type="text" id="f-due" placeholder="e.g. 30-09-2025"/>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn-sm primary" onclick="addFinding()">Add Finding</button>
+        <button class="btn-sm" onclick="cancelFindingForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Findings list -->
+    <div id="findings-list">
+      <div class="empty-findings" id="findings-empty">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 12h6M9 16h4M7 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8l-5-5H7z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p>No findings added yet.<br/>Add manually or pull from Finding Builder history.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- Actions -->
+  <div class="actions-bar">
+    <button class="btn-generate" id="gen-btn" onclick="generateReport()">
+      <span id="btn-label">Generate Report Preview</span>
+      <svg id="btn-arrow" viewBox="0 0 13 13" fill="none" width="12" height="12" style="opacity:.6"><path d="M2.5 6.5H10.5M7 3L10.5 6.5L7 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="spinner" id="spinner"></div>
+    </button>
+    <button class="btn-export-word" id="export-btn" onclick="exportWord()" disabled>
+      <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M7 2v7M4 6l3 3 3-3M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Export Word (.doc)
+    </button>
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="preview-wrap">
+    <div class="preview-header">
+      <div class="preview-title">Report Preview</div>
+      <button class="btn-sm" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M2 8L6 4L10 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to top
+      </button>
+    </div>
+    <div class="preview-card" id="preview-card"></div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer><p>© 2026 Worrkly · Audit Recipe · Report Builder</p></footer>
+
+<script>
+  /* ── State ── */
+  const RISK_ORDER = ['Critical','High','Medium','Low'];
+  const RISK_COLORS = {
+    Critical:{color:'#D94040',dim:'rgba(217,64,64,0.08)',border:'rgba(217,64,64,0.2)'},
+    High:    {color:'#C98A00',dim:'rgba(201,138,0,0.08)', border:'rgba(201,138,0,0.2)'},
+    Medium:  {color:'#0057FF',dim:'rgba(0,87,255,0.08)',  border:'rgba(0,87,255,0.2)'},
+    Low:     {color:'#1A9E5C',dim:'rgba(26,158,92,0.08)', border:'rgba(26,158,92,0.2)'},
+  };
+  const RATING_COLORS = {
+    'Strong':             {bg:'#1A9E5C',text:'#fff'},
+    'Satisfactory':       {bg:'#0057FF',text:'#fff'},
+    'Needs Improvement':  {bg:'#C98A00',text:'#fff'},
+    'Unsatisfactory':     {bg:'#D94040',text:'#fff'},
+  };
+
+  let findings      = [];
+  let currentRating = '';
+  let prevRating    = '';
+  let reportData    = null;
+  let findingEditIdx = -1;
+  let historyOpen   = false;
+  let formOpen      = false;
+
+  /* ── Rating pills ── */
+  function selectRating(btn, cls, group) {
+    const isP = group === 'prev';
+    const pills = isP ? document.querySelectorAll('#prev-pills .rating-pill') : document.querySelectorAll('.rating-pills:not(#prev-pills) .rating-pill');
+    pills.forEach(p => p.className = 'rating-pill');
+    btn.classList.add('sel-' + cls.toLowerCase().replace(/\s+/g,'-').replace('needs-improvement','needs'));
+    if (isP) prevRating = btn.dataset.rating;
+    else     currentRating = btn.dataset.rating;
+  }
+
+  /* ── History picker ── */
+  function toggleHistoryPicker() {
+    historyOpen = !historyOpen;
+    const picker = document.getElementById('history-picker');
+    picker.classList.toggle('open', historyOpen);
+    if (historyOpen) renderHistoryPicker();
+  }
+
+  function renderHistoryPicker() {
+    const history = JSON.parse(localStorage.getItem('fr_history') || '[]');
+    const list = document.getElementById('history-picker-list');
+    if (!history.length) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--ink4);font-size:13px;">No Finding Builder history found. Generate some findings first.</div>';
+      return;
+    }
+    list.innerHTML = history.map((e,i) => {
+      const d     = new Date(e.timestamp);
+      const date  = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+      const title = e.result?.title || e.input?.summary?.substring(0,60) || 'Untitled';
+      const risk  = e.input?.riskLevel || '';
+      const rc    = RISK_COLORS[risk];
+      const alreadyAdded = findings.some(f => f._historyId === e.id);
+      return `<div class="history-pick-item ${alreadyAdded ? 'opacity-50' : ''}" onclick="pickFromHistory(${i})" style="${alreadyAdded?'opacity:.45;cursor:not-allowed;':''}">
+        ${rc ? `<span class="risk-chip" style="background:${rc.dim};color:${rc.color};border:1px solid ${rc.border};">${risk}</span>` : ''}
+        <span class="history-pick-title">${escHtml(title)}</span>
+        <span class="history-pick-date">${date}</span>
+        ${alreadyAdded ? '<span style="font-size:10px;color:var(--ink4);">Added</span>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function pickFromHistory(idx) {
+    const history = JSON.parse(localStorage.getItem('fr_history') || '[]');
+    const e = history[idx];
+    if (!e || findings.some(f => f._historyId === e.id)) return;
+    const r = e.result || {};
+    findings.push({
+      _historyId:      e.id,
+      title:           r.title || e.input?.summary?.substring(0,60) || 'Untitled',
+      tracking:        '',
+      summary:         r.summary || '',
+      specific:        r.specific_issue || '',
+      rootCause:       r.root_cause || '',
+      risk:            e.input?.riskLevel || 'Medium',
+      repeat:          'Not Repeated',
+      ref:             e.input?.regulation || '',
+      mgmtResponse:    'Discussed and Agreed',
+      actionPlan:      r.action_plans?.map(a => a.action).join('\n') || '',
+      actionOwner:     r.action_plans?.[0]?.owner || '',
+      targetDate:      r.action_plans?.[0]?.due || '',
+      risks:           r.risks || [],
+    });
+    renderFindings();
+    renderHistoryPicker();
+  }
+
+  /* ── Finding form ── */
+  function toggleFindingForm() {
+    formOpen = !formOpen;
+    document.getElementById('finding-form').classList.toggle('open', formOpen);
+    if (formOpen) {
+      clearFindingForm();
+      document.getElementById('f-title').focus();
+      // Close history picker
+      historyOpen = false;
+      document.getElementById('history-picker').classList.remove('open');
+    }
+  }
+
+  function cancelFindingForm() {
+    formOpen = false;
+    findingEditIdx = -1;
+    document.getElementById('finding-form').classList.remove('open');
+    clearFindingForm();
+  }
+
+  function clearFindingForm() {
+    ['f-title','f-tracking','f-summary','f-specific','f-rootcause','f-ref','f-action','f-owner','f-due'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-risk').value = '';
+    document.getElementById('f-repeat').value = 'Not Repeated';
+    document.getElementById('f-mgmt-response').value = 'Discussed and Agreed';
+    document.querySelector('.finding-form-title').textContent = 'New Finding';
+  }
+
+  function addFinding() {
+    const title   = document.getElementById('f-title').value.trim();
+    const summary = document.getElementById('f-summary').value.trim();
+    const risk    = document.getElementById('f-risk').value;
+    if (!title)   { alert('Please enter a finding title.'); return; }
+    if (!summary) { alert('Please enter the finding summary.'); return; }
+    if (!risk)    { alert('Please select a risk level.'); return; }
+
+    const finding = {
+      title,
+      tracking:     document.getElementById('f-tracking').value.trim(),
+      summary,
+      specific:     document.getElementById('f-specific').value.trim(),
+      rootCause:    document.getElementById('f-rootcause').value.trim(),
+      risk,
+      repeat:       document.getElementById('f-repeat').value,
+      ref:          document.getElementById('f-ref').value.trim(),
+      mgmtResponse: document.getElementById('f-mgmt-response').value,
+      actionPlan:   document.getElementById('f-action').value.trim(),
+      actionOwner:  document.getElementById('f-owner').value.trim(),
+      targetDate:   document.getElementById('f-due').value.trim(),
+      risks:        [],
+    };
+
+    if (findingEditIdx >= 0) {
+      findings[findingEditIdx] = { ...findings[findingEditIdx], ...finding };
+      findingEditIdx = -1;
+    } else {
+      findings.push(finding);
+    }
+    cancelFindingForm();
+    renderFindings();
+  }
+
+  function editFinding(idx) {
+    const f = findings[idx];
+    findingEditIdx = idx;
+    document.getElementById('f-title').value        = f.title;
+    document.getElementById('f-tracking').value     = f.tracking || '';
+    document.getElementById('f-summary').value      = f.summary;
+    document.getElementById('f-specific').value     = f.specific || '';
+    document.getElementById('f-rootcause').value    = f.rootCause || '';
+    document.getElementById('f-risk').value         = f.risk;
+    document.getElementById('f-repeat').value       = f.repeat || 'Not Repeated';
+    document.getElementById('f-ref').value          = f.ref || '';
+    document.getElementById('f-mgmt-response').value = f.mgmtResponse || 'Discussed and Agreed';
+    document.getElementById('f-action').value       = f.actionPlan || '';
+    document.getElementById('f-owner').value        = f.actionOwner || '';
+    document.getElementById('f-due').value          = f.targetDate || '';
+    document.querySelector('.finding-form-title').textContent = 'Edit Finding';
+    formOpen = true;
+    document.getElementById('finding-form').classList.add('open');
+    document.getElementById('finding-form').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  function deleteFinding(idx) {
+    findings.splice(idx, 1);
+    renderFindings();
+  }
+
+  function renderFindings() {
+    const list  = document.getElementById('findings-list');
+    const empty = document.getElementById('findings-empty');
+    document.getElementById('findings-count').textContent = `${findings.length} finding${findings.length !== 1 ? 's' : ''} added`;
+
+    // Sort by risk
+    const sorted = [...findings].sort((a,b) => RISK_ORDER.indexOf(a.risk) - RISK_ORDER.indexOf(b.risk));
+    // Update findings array order
+    findings = sorted;
+
+    if (!findings.length) {
+      list.innerHTML = '';
+      list.appendChild(empty || createEmptyEl());
+      document.getElementById('findings-empty').style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    list.innerHTML = findings.map((f, i) => {
+      const rc = RISK_COLORS[f.risk] || {};
+      return `<div class="finding-item">
+        <div class="finding-drag">⠿</div>
+        <div class="finding-body">
+          <div class="finding-title">${escHtml(f.title)}</div>
+          <div class="finding-meta">
+            ${rc.color ? `<span class="risk-chip" style="background:${rc.dim};color:${rc.color};border:1px solid ${rc.border};">${f.risk}</span>` : ''}
+            ${f.tracking ? `<span style="font-size:11px;color:var(--ink4);font-family:'DM Mono',monospace;">${escHtml(f.tracking)}</span>` : ''}
+            ${f.repeat ? `<span style="font-size:11px;color:var(--ink4);">${escHtml(f.repeat)}</span>` : ''}
+          </div>
+        </div>
+        <div class="finding-actions">
+          <button class="icon-btn" onclick="editFinding(${i})" title="Edit">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5l2 2L4 10H2v-2L8.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="icon-btn del" onclick="deleteFinding(${i})" title="Delete">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 3h8M5 3V2h2v1M4 3v7h4V3H4z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ── Generate Report ── */
+  async function generateReport() {
+    const orgName    = document.getElementById('org-name').value.trim();
+    const repTitle   = document.getElementById('report-title').value.trim();
+    const objectiveInput = document.getElementById('audit-objective-input').value.trim();
+    const scopeInput     = document.getElementById('audit-scope-input').value.trim();
+    const errBox         = document.getElementById('error-box');
+    errBox.style.display = 'none';
+
+    if (!orgName)        { errBox.textContent='Please enter the organisation name.'; errBox.style.display='block'; return; }
+    if (!repTitle)       { errBox.textContent='Please enter the report title.'; errBox.style.display='block'; return; }
+    if (!currentRating)  { errBox.textContent='Please select a current audit rating.'; errBox.style.display='block'; return; }
+    if (!objectiveInput) { errBox.textContent='Please enter the audit objective key points.'; errBox.style.display='block'; return; }
+    if (!scopeInput)     { errBox.textContent='Please enter the scope & coverage key points.'; errBox.style.display='block'; return; }
+    if (!findings.length){ errBox.textContent='Please add at least one finding.'; errBox.style.display='block'; return; }
+
+    setLoading(true);
+
+    const findingsSummary = findings.map((f,i) => `${i+1}. [${f.risk}] ${f.title}: ${f.summary}`).join('\n');
+    const counts = { Critical:0, High:0, Medium:0, Low:0 };
+    findings.forEach(f => { if (counts[f.risk] !== undefined) counts[f.risk]++; });
+
+    // Single AI call generates executive summary + objective + scope
+    const systemPrompt = `You are a senior Certified Internal Auditor (CIA) writing a professional internal audit report for a bank's board and audit committee. Return ONLY a valid JSON object with no extra text or markdown:
+{
+  "executive_summary": "3-4 professional paragraphs: justify the overall audit rating, summarise key findings grouped by risk level referencing specific finding titles, identify common root causes, and conclude with overall assessment. Third person, board-level tone.",
+  "audit_objective": "2-3 professional paragraphs expanding the auditor's notes into a formal audit objective section. Start with the overarching purpose, then list specific objectives (A, B, C...) in flowing prose. Reference governance, risk management and internal controls.",
+  "audit_scope": "1-2 professional paragraphs expanding the scope notes into a formal scope & coverage section. Include audit plan context, coverage period, fieldwork duration, departments/units covered, and methodology."
+}`;
+
+    const userPrompt = `Organisation: ${orgName}
+Audit Title: ${repTitle}
+Audit Period: ${document.getElementById('audit-period').value.trim() || 'Not specified'}
+Overall Rating: ${currentRating}
+Finding counts — Critical: ${counts.Critical}, High: ${counts.High}, Medium: ${counts.Medium}, Low: ${counts.Low}
+Findings:
+${findingsSummary}
+
+Audit Objective Notes: ${objectiveInput}
+Scope & Coverage Notes: ${scopeInput}`;
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1500,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }],
+        }),
+      });
+      const data = await res.json();
+      const raw  = (data.content?.[0]?.text || '').replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(raw);
+
+      // Show generated objective & scope in preview boxes
+      const objText = document.getElementById('objective-text');
+      const scoText = document.getElementById('scope-text');
+      objText.textContent = parsed.audit_objective || '';
+      scoText.textContent = parsed.audit_scope     || '';
+      document.getElementById('objective-preview').style.display = 'block';
+      document.getElementById('scope-preview').style.display     = 'block';
+
+      reportData = {
+        orgName,
+        reportTitle:  repTitle,
+        reportRef:    document.getElementById('report-ref').value.trim(),
+        reportDate:   document.getElementById('report-date').value.trim(),
+        auditPeriod:  document.getElementById('audit-period').value.trim(),
+        preparedBy:   document.getElementById('prepared-by').value.trim(),
+        reviewedBy:   document.getElementById('reviewed-by').value.trim(),
+        issuedBy:     document.getElementById('issued-by').value.trim(),
+        currentRating,
+        prevRating,
+        objective:    parsed.audit_objective || objectiveInput,
+        scope:        parsed.audit_scope     || scopeInput,
+        disclaimer:   document.getElementById('audit-disclaimer').value.trim(),
+        executiveSummary: parsed.executive_summary,
+        findings: [...findings].sort((a,b) => RISK_ORDER.indexOf(a.risk) - RISK_ORDER.indexOf(b.risk)),
+      };
+
+      renderPreview(reportData);
+      document.getElementById('export-btn').disabled = false;
+      document.getElementById('preview-wrap').style.display = 'block';
+      setTimeout(() => document.getElementById('preview-wrap').scrollIntoView({ behavior:'smooth', block:'start' }), 80);
+
+      // Save to admin history
+      const repHistory = JSON.parse(localStorage.getItem('ar_report_history') || '[]');
+      repHistory.unshift({ id: Date.now(), timestamp: new Date().toISOString(), data: reportData });
+      if (repHistory.length > 100) repHistory.splice(100);
+      localStorage.setItem('ar_report_history', JSON.stringify(repHistory));
+
+    } catch(e) {
+      const errMsg = e?.message || 'Unknown error';
+      errBox.textContent = `Generation failed: ${errMsg}. Check your API key and try again.`;
+      errBox.style.display = 'block';
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /* ── Render Preview ── */
+  function renderPreview(d) {
+    const counts = { Critical:0, High:0, Medium:0, Low:0 };
+    d.findings.forEach(f => { if (counts[f.risk] !== undefined) counts[f.risk]++; });
+    const total = d.findings.length;
+    const curR  = RATING_COLORS[d.currentRating] || { bg:'#7A7A7A', text:'#fff' };
+    const prevR = d.prevRating ? (RATING_COLORS[d.prevRating] || { bg:'#7A7A7A', text:'#fff' }) : null;
+
+    // Group findings by risk
+    const grouped = {};
+    RISK_ORDER.forEach(r => { grouped[r] = d.findings.filter(f => f.risk === r); });
+
+    let html = `
+    <!-- COVER -->
+    <div class="rp-cover">
+      <div class="rp-cover-label">Internal Audit Report</div>
+      <div class="rp-cover-title">${escHtml(d.reportTitle)}</div>
+      <div class="rp-cover-date">${escHtml(d.reportDate)}${d.orgName ? ' · ' + escHtml(d.orgName) : ''}</div>
+      <table class="rp-cover-table">
+        ${d.reportRef   ? `<tr><td>Report Ref:</td><td>${escHtml(d.reportRef)}</td></tr>` : ''}
+        ${d.preparedBy  ? `<tr><td>Prepared by:</td><td>${escHtml(d.preparedBy)}</td></tr>` : ''}
+        ${d.reviewedBy  ? `<tr><td>Reviewed by:</td><td>${escHtml(d.reviewedBy)}</td></tr>` : ''}
+        ${d.issuedBy    ? `<tr><td>Issued by:</td><td>${escHtml(d.issuedBy)}</td></tr>` : ''}
+      </table>
+      <div class="rp-confidential">Confidential</div>
+    </div>
+
+    <!-- RATING + EXECUTIVE SUMMARY -->
+    <div class="rp-section">
+      <table class="rating-table">
+        <thead><tr><th>Overall Audit Rating</th><th>Current Audit</th>${prevR ? '<th>Previous Audit</th>' : ''}</tr></thead>
+        <tbody><tr>
+          <td></td>
+          <td><span class="rating-cell" style="background:${curR.bg};color:${curR.text};">${escHtml(d.currentRating)}</span></td>
+          ${prevR ? `<td><span class="rating-cell" style="background:${prevR.bg};color:${prevR.text};">${escHtml(d.prevRating)}</span></td>` : ''}
+        </tr></tbody>
+      </table>
+      <div class="rp-section-title">Executive Summary</div>
+      <div class="rp-text">${escHtml(d.executiveSummary).replace(/\n\n/g,'</div><div class="rp-text" style="margin-top:12px;">').replace(/\n/g,'<br/>')}</div>
+    </div>
+
+    <!-- AUDIT OBJECTIVE -->
+    <div class="rp-section">
+      <div class="rp-section-title">Audit Objectives</div>
+      <div class="rp-text">${escHtml(d.objective).replace(/\n/g,'<br/>')}</div>
+    </div>
+
+    <!-- SCOPE -->
+    <div class="rp-section">
+      <div class="rp-section-title">Audit Scope & Coverage</div>
+      <div class="rp-text">${escHtml(d.scope).replace(/\n/g,'<br/>')}</div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="rp-section">
+      <div class="rp-section-title">Audit Disclaimer</div>
+      <div class="rp-text">${escHtml(d.disclaimer).replace(/\n/g,'<br/>')}</div>
+    </div>
+
+    <!-- FINDINGS SUMMARY -->
+    <div class="rp-section">
+      <div class="rp-section-title">Audit Findings Summary</div>
+      <div class="rp-text" style="margin-bottom:16px;">Following table sets out the number of findings noted in this audit with the risk rating followed by summary of findings.</div>
+      <table class="summary-table">
+        <thead><tr><th>Overall Finding</th><th style="color:#D94040">Critical Risk</th><th style="color:#C98A00">High Risk</th><th style="color:#0057FF">Medium Risk</th><th style="color:#1A9E5C">Low Risk</th><th>Total</th></tr></thead>
+        <tbody><tr><td></td>
+          <td style="text-align:center;font-weight:700;color:#D94040">${counts.Critical}</td>
+          <td style="text-align:center;font-weight:700;color:#C98A00">${counts.High}</td>
+          <td style="text-align:center;font-weight:700;color:#0057FF">${counts.Medium}</td>
+          <td style="text-align:center;font-weight:700;color:#1A9E5C">${counts.Low}</td>
+          <td style="text-align:center;font-weight:700;">${total}</td>
+        </tr></tbody>
+      </table>
+      <table class="summary-table">
+        <thead><tr><th>SN</th><th style="text-align:left">Audit Findings</th><th>Rating</th></tr></thead>
+        <tbody>
+          ${d.findings.map((f,i) => {
+            const rc = RISK_COLORS[f.risk]||{};
+            return `<tr>
+              <td>${i+1}</td>
+              <td>${escHtml(f.title)}</td>
+              <td style="text-align:center;"><span class="risk-chip" style="background:${rc.dim||''};color:${rc.color||''};border:1px solid ${rc.border||''};">${f.risk}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DETAILED FINDINGS grouped by risk -->
+    ${RISK_ORDER.map(riskLevel => {
+      const group = grouped[riskLevel];
+      if (!group.length) return '';
+      const rc = RISK_COLORS[riskLevel];
+      return `<div class="rp-section">
+        <div class="rp-section-title" style="border-color:${rc.color};color:${rc.color};">${riskLevel} Risk Findings</div>
+        ${group.map(f => `
+          <div class="finding-detail" style="margin-bottom:20px;">
+            <div class="finding-detail-header">
+              <div class="finding-detail-name">${escHtml(f.title)}</div>
+              <div class="finding-detail-meta">
+                ${f.tracking ? `<div style="font-size:11px;font-weight:600;color:var(--ink3);">Finding Tracking No.</div><div style="font-size:12px;font-family:'DM Mono',monospace;">${escHtml(f.tracking)}</div>` : ''}
+                <div><span class="risk-chip" style="background:${rc.dim};color:${rc.color};border:1px solid ${rc.border};">${riskLevel}</span></div>
+              </div>
+            </div>
+            <div class="finding-detail-body">
+              ${escHtml(f.summary)}
+              ${f.specific ? `<br/><br/><strong>Specifically,</strong><br/>${escHtml(f.specific)}` : ''}
+            </div>
+            <div class="finding-detail-row">
+              <div class="finding-detail-cell">
+                <div class="finding-detail-cell-label">Ref:</div>
+                <div style="font-size:13px;">${f.ref ? escHtml(f.ref) : '—'}</div>
+                ${f.rootCause ? `<div class="finding-detail-cell-label" style="margin-top:8px;">Root Cause:</div><div style="font-size:13px;">${escHtml(f.rootCause)}</div>` : ''}
+              </div>
+              <div class="finding-detail-cell">
+                <div class="finding-detail-cell-label">Repeat Status:</div>
+                <div style="font-size:13px;">${escHtml(f.repeat||'Not Repeated')}</div>
+              </div>
+            </div>
+            <div class="finding-detail-row" style="display:block;">
+              <div class="finding-detail-cell" style="border-right:none;">
+                <div class="finding-detail-cell-label">Management Response:</div>
+                <div style="font-size:13px;">${escHtml(f.mgmtResponse||'Discussed and Agreed')}</div>
+              </div>
+            </div>
+            <div class="action-plan-row">
+              <div class="action-plan-cell">
+                <div class="finding-detail-cell-label">Management Action Plan:</div>
+                <div style="font-size:13px;line-height:1.7;">${f.actionPlan ? escHtml(f.actionPlan) : '—'}</div>
+              </div>
+              <div class="action-plan-cell" style="border-left:1px solid var(--borderMd);">
+                <div class="finding-detail-cell-label">Action Owner:</div>
+                <div style="font-size:13px;">${f.actionOwner ? escHtml(f.actionOwner) : '—'}</div>
+                ${f.targetDate ? `<div class="finding-detail-cell-label" style="margin-top:8px;">Target Date:</div><div style="font-size:13px;">${escHtml(f.targetDate)}</div>` : ''}
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    }).join('')}`;
+
+    document.getElementById('preview-card').innerHTML = html;
+  }
+
+  /* ── Export Word ── */
+  function exportWord() {
+    if (!reportData) return;
+    const d = reportData;
+    const counts = { Critical:0, High:0, Medium:0, Low:0 };
+    d.findings.forEach(f => { if (counts[f.risk] !== undefined) counts[f.risk]++; });
+    const grouped = {};
+    RISK_ORDER.forEach(r => { grouped[r] = d.findings.filter(f => f.risk === r); });
+
+    const findingRows = d.findings.map((f,i) => `<tr><td style="text-align:center;border:1px solid #ccc;padding:6pt 10pt;font-weight:600;">${i+1}</td><td style="border:1px solid #ccc;padding:6pt 10pt;">${f.title}</td><td style="text-align:center;border:1px solid #ccc;padding:6pt 10pt;font-weight:600;color:${RISK_COLORS[f.risk]?.color||'#000'}">${f.risk}</td></tr>`).join('');
+
+    const detailedFindings = RISK_ORDER.map(riskLevel => {
+      const group = grouped[riskLevel];
+      if (!group.length) return '';
+      const color = RISK_COLORS[riskLevel]?.color || '#000';
+      return group.map(f => `
+        <h2 style="color:${color};border-bottom:2px solid ${color};padding-bottom:4pt;margin-top:20pt;">${riskLevel} Risk Findings</h2>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16pt;">
+          <tr>
+            <td style="border:1px solid #ccc;padding:8pt 12pt;font-weight:700;font-size:12pt;width:65%;">${f.title}</td>
+            <td style="border:1px solid #ccc;padding:8pt 12pt;vertical-align:top;width:35%;">
+              ${f.tracking ? `<div style="font-size:9pt;color:#888;font-weight:600;">FINDING TRACKING NO.</div><div style="font-size:11pt;">${f.tracking}</div>` : ''}
+              <div style="margin-top:4pt;"><span style="background:${RISK_COLORS[riskLevel]?.color};color:#fff;padding:2pt 8pt;border-radius:4pt;font-size:10pt;font-weight:600;">${riskLevel}</span></div>
+            </td>
+          </tr>
+          <tr><td colspan="2" style="border:1px solid #ccc;padding:10pt 12pt;font-size:11pt;line-height:1.7;">${f.summary}${f.specific ? `<br/><br/><strong>Specifically,</strong><br/>${f.specific}` : ''}</td></tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:8pt 12pt;vertical-align:top;">
+              <strong>Ref:</strong><br/>${f.ref || '—'}
+              ${f.rootCause ? `<br/><br/><strong>Root Cause:</strong><br/>${f.rootCause}` : ''}
+            </td>
+            <td style="border:1px solid #ccc;padding:8pt 12pt;vertical-align:top;"><strong>Repeat Status:</strong><br/>${f.repeat || 'Not Repeated'}</td>
+          </tr>
+          <tr><td colspan="2" style="border:1px solid #ccc;padding:8pt 12pt;"><strong>Management Response:</strong><br/>${f.mgmtResponse || 'Discussed and Agreed'}</td></tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:8pt 12pt;vertical-align:top;"><strong>Management Action Plan:</strong><br/>${f.actionPlan || '—'}</td>
+            <td style="border:1px solid #ccc;padding:8pt 12pt;vertical-align:top;"><strong>Action Owner:</strong><br/>${f.actionOwner || '—'}${f.targetDate ? `<br/><br/><strong>Target Date:</strong><br/>${f.targetDate}` : ''}</td>
+          </tr>
+        </table>`).join('');
+    }).join('');
+
+    const curR  = RATING_COLORS[d.currentRating] || { bg:'#888', text:'#fff' };
+    const prevR = d.prevRating ? (RATING_COLORS[d.prevRating] || { bg:'#888', text:'#fff' }) : null;
+
+    const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+<head><meta charset="UTF-8"/><title>${d.reportTitle}</title>
+<style>
+  body{font-family:Arial,sans-serif;font-size:11pt;color:#0C0C0C;margin:2.5cm 2cm;}
+  h1{font-size:16pt;font-weight:bold;text-align:center;letter-spacing:-0.5pt;}
+  h2{font-size:12pt;font-weight:bold;border-bottom:2px solid #0C0C0C;padding-bottom:4pt;margin:18pt 0 8pt;}
+  p{font-size:11pt;line-height:1.75;color:#3A3A3A;margin-bottom:8pt;}
+  .cover{text-align:center;page-break-after:always;padding:80pt 0 40pt;}
+  .cover-label{font-size:11pt;color:#7A7A7A;letter-spacing:1pt;text-transform:uppercase;margin-bottom:16pt;}
+  .cover-title{font-size:22pt;font-weight:bold;margin-bottom:8pt;}
+  .cover-date{font-size:12pt;color:#7A7A7A;margin-bottom:32pt;}
+  .cover-table{margin:0 auto;border-collapse:collapse;width:320pt;}
+  .cover-table td{border:1px solid #ccc;padding:6pt 12pt;font-size:10pt;}
+  .cover-table td:first-child{font-weight:600;background:#f5f5f4;width:110pt;}
+  .confidential{margin-top:32pt;font-size:9pt;color:#C0C0C0;letter-spacing:2pt;text-transform:uppercase;}
+  .rating-table{border-collapse:collapse;width:100%;margin-bottom:16pt;}
+  .rating-table th,.rating-table td{border:1px solid #ccc;padding:7pt 12pt;text-align:center;font-size:11pt;}
+  .rating-table th{font-weight:600;background:#f5f5f4;}
+  .summary-table{border-collapse:collapse;width:100%;margin-bottom:12pt;}
+  .summary-table th,.summary-table td{border:1px solid #ccc;padding:7pt 12pt;font-size:11pt;}
+  .summary-table th{font-weight:600;background:#f5f5f4;text-align:center;}
+  .footer-note{margin-top:40pt;font-size:9pt;color:#C0C0C0;border-top:1px solid #eee;padding-top:8pt;text-align:center;}
+</style></head><body>
+
+<div class="cover">
+  <div class="cover-label">Internal Audit Report</div>
+  <div class="cover-title">${d.reportTitle}</div>
+  <div class="cover-date">${d.reportDate}${d.orgName ? ' · ' + d.orgName : ''}</div>
+  <table class="cover-table">
+    ${d.reportRef  ? `<tr><td>Report Ref:</td><td>${d.reportRef}</td></tr>` : ''}
+    ${d.preparedBy ? `<tr><td>Prepared by:</td><td>${d.preparedBy}</td></tr>` : ''}
+    ${d.reviewedBy ? `<tr><td>Reviewed by:</td><td>${d.reviewedBy}</td></tr>` : ''}
+    ${d.issuedBy   ? `<tr><td>Issued by:</td><td>${d.issuedBy}</td></tr>` : ''}
+  </table>
+  <div class="confidential">Confidential</div>
+</div>
+
+<h2>Overall Audit Rating</h2>
+<table class="rating-table">
+  <tr><th>Overall Audit Rating</th><th>Current Audit</th>${prevR ? '<th>Previous Audit</th>' : ''}</tr>
+  <tr><td></td>
+    <td><span style="background:${curR.bg};color:${curR.text};padding:3pt 16pt;border-radius:4pt;font-weight:700;">${d.currentRating}</span></td>
+    ${prevR ? `<td><span style="background:${prevR.bg};color:${prevR.text};padding:3pt 16pt;border-radius:4pt;font-weight:700;">${d.prevRating}</span></td>` : ''}
+  </tr>
+</table>
+
+<h2>Executive Summary</h2>
+${d.executiveSummary.split('\n\n').map(p => `<p>${p.replace(/\n/g,'<br/>')}</p>`).join('')}
+
+<h2>Audit Objectives</h2>
+<p>${d.objective.replace(/\n/g,'<br/>')}</p>
+
+<h2>Audit Scope &amp; Coverage</h2>
+<p>${d.scope.replace(/\n/g,'<br/>')}</p>
+
+<h2>Audit Disclaimer</h2>
+<p>${d.disclaimer.replace(/\n/g,'<br/>')}</p>
+
+<h2>Audit Findings Summary</h2>
+<p>Following table sets out the number of findings noted in this audit with the risk rating followed by summary of findings.</p>
+<table class="summary-table">
+  <tr><th>Overall Finding</th><th style="color:#D94040">Critical Risk</th><th style="color:#C98A00">High Risk</th><th style="color:#0057FF">Medium Risk</th><th style="color:#1A9E5C">Low Risk</th><th>Total</th></tr>
+  <tr><td style="text-align:center;"></td>
+    <td style="text-align:center;font-weight:700;color:#D94040">${counts.Critical}</td>
+    <td style="text-align:center;font-weight:700;color:#C98A00">${counts.High}</td>
+    <td style="text-align:center;font-weight:700;color:#0057FF">${counts.Medium}</td>
+    <td style="text-align:center;font-weight:700;color:#1A9E5C">${counts.Low}</td>
+    <td style="text-align:center;font-weight:700;">${d.findings.length}</td>
+  </tr>
+</table>
+<table class="summary-table">
+  <tr><th style="width:50pt">SN</th><th style="text-align:left">Audit Findings</th><th style="width:80pt">Rating</th></tr>
+  ${findingRows}
+</table>
+
+<h2>Detailed Audit Findings</h2>
+${detailedFindings}
+
+<div class="footer-note">Generated by Audit Recipe · Worrkly Internal Audit Tools · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div>
+</body></html>`;
+
+    const blob = new Blob([html], { type:'application/msword' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `Audit-Report-${d.reportTitle.replace(/[^a-z0-9]/gi,'-').substring(0,50)}.doc`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* ── Helpers ── */
+  function setLoading(on) {
+    const btn = document.getElementById('gen-btn');
+    btn.disabled = on;
+    document.getElementById('btn-label').textContent  = on ? 'AI generating report sections...' : 'Generate Report Preview';
+    document.getElementById('btn-arrow').style.display = on ? 'none' : 'inline';
+    document.getElementById('spinner').style.display   = on ? 'inline-block' : 'none';
+  }
+
+  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function clearGenerated(type) {
+    if (type === 'objective') {
+      document.getElementById('objective-preview').style.display = 'none';
+      document.getElementById('objective-text').textContent = '';
+      document.getElementById('audit-objective-input').value = '';
+    } else {
+      document.getElementById('scope-preview').style.display = 'none';
+      document.getElementById('scope-text').textContent = '';
+      document.getElementById('audit-scope-input').value = '';
+    }
+  }
+
+  /* ── Attempt limit shared with Finding Builder ── */
+  // Report Builder uses the same attempt counter
+  const WEEKLY_LIMIT = 5;
+  function getMondayKey() {
+    const now=new Date(),day=now.getDay(),diff=(day===0?-6:1-day),mon=new Date(now);
+    mon.setDate(now.getDate()+diff);
+    return `fr_week_${mon.getFullYear()}_${mon.getMonth()}_${mon.getDate()}`;
+  }
+  function getAttempts() { const key=getMondayKey(),data=JSON.parse(localStorage.getItem('fr_attempts')||'{}'); return data[key]||0; }
+  function incrementAttempts() {
+    const key=getMondayKey(),data=JSON.parse(localStorage.getItem('fr_attempts')||'{}');
+    data[key]=(data[key]||0)+1;
+    Object.keys(data).forEach(k=>{ if(k!==key) delete data[k]; });
+    localStorage.setItem('fr_attempts',JSON.stringify(data));
+  }
+
+  // Override generate to check limit
+  const _origGenerate = generateReport;
+  window.generateReport = async function() {
+    if (getAttempts() >= WEEKLY_LIMIT) {
+      const errBox = document.getElementById('error-box');
+      errBox.textContent = `Weekly limit of ${WEEKLY_LIMIT} attempts reached. Resets every Monday.`;
+      errBox.style.display = 'block';
+      return;
+    }
+    await _origGenerate();
+    if (reportData) incrementAttempts();
+  };
+</script>
+</body>
+</html>

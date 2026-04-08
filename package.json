@@ -1,0 +1,9 @@
+{
+  "name": "audit-recipe",
+  "version": "1.0.0",
+  "description": "Audit Recipe — Internal Audit Platform by Worrkly",
+  "private": true,
+  "engines": {
+    "node": "18.x"
+  }
+}

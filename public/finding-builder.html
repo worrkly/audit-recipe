@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Audit Recipe — Finding Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Fustat:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #F9F9F8;
+      --card:     #FFFFFF;
+      --ink:      #0C0C0C;
+      --ink2:     #3A3A3A;
+      --ink3:     #7A7A7A;
+      --ink4:     #C0C0C0;
+      --border:   rgba(0,0,0,0.07);
+      --borderMd: rgba(0,0,0,0.11);
+      --blue:     #0057FF;
+      --blueDim:  rgba(0,87,255,0.06);
+      --green:    #1A9E5C;
+      --greenDim: rgba(26,158,92,0.07);
+      --red:      #D94040;
+      --amber:    #C98A00;
+      --purple:   #6B21A8;
+      --teal:     #0E7490;
+      --r:        10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg); color: var(--ink);
+      -webkit-font-smoothing: antialiased; min-height: 100vh;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.022;
+    }
+
+    /* NAV */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(249,249,248,0.9);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav { max-width: 1100px; margin: 0 auto; padding: 0 44px; display: flex; align-items: center; height: 58px; }
+    .nav-logo {
+      font-family: 'Fustat', sans-serif; font-weight: 800; font-size: 16px;
+      color: var(--ink); letter-spacing: -0.5px; text-decoration: none;
+      display: flex; align-items: center; gap: 9px; margin-right: auto;
+    }
+    .logo-icon { width:28px; height:28px; border-radius:7px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
+    .logo-icon svg { width:14px; height:14px; }
+    .nav-pill { font-size:11.5px; font-weight:500; color:var(--ink4); padding:4px 12px; border:1px solid var(--borderMd); border-radius:100px; }
+
+    /* LAYOUT */
+    main { max-width: 760px; margin: 0 auto; padding: 56px 24px 100px; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes spin   { to { transform: rotate(360deg); } }
+    .a1 { opacity:0; animation: fadeUp .6s .05s cubic-bezier(.22,1,.36,1) forwards; }
+    .a2 { opacity:0; animation: fadeUp .6s .12s cubic-bezier(.22,1,.36,1) forwards; }
+
+    /* HERO */
+    .hero { margin-bottom: 40px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px 4px 8px; background: var(--greenDim);
+      border: 1px solid rgba(26,158,92,0.2); border-radius: 100px; margin-bottom: 18px;
+    }
+    .hero-dot { width:6px; height:6px; border-radius:50%; background:var(--green); display:inline-block; }
+    .hero-badge span { font-size:11.5px; font-weight:500; color:var(--green); }
+    .hero h1 {
+      font-family: 'Fustat', sans-serif; font-size: clamp(30px,5vw,44px);
+      font-weight: 800; letter-spacing: -1.8px; line-height: 1.08;
+      color: var(--ink); margin-bottom: 12px;
+    }
+    .hero p { font-size:15px; color:var(--ink3); font-weight:300; line-height:1.65; max-width:520px; }
+
+    /* INPUT CARD */
+    .input-card {
+      background: var(--card); border: 1px solid var(--borderMd);
+      border-radius: 14px; padding: 28px; margin-bottom: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    }
+    .section-divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 24px 0 18px; padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-divider:first-child { margin-top: 0; }
+    .section-divider-num {
+      width:22px; height:22px; border-radius:6px; background:var(--ink); color:#fff;
+      font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .section-divider span { font-size:11.5px; font-weight:600; color:var(--ink3); letter-spacing:.04em; text-transform:uppercase; }
+
+    /* FORM */
+    .form-group { margin-bottom: 16px; }
+    .form-label-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+    label { font-size:12px; font-weight:500; color:var(--ink3); }
+    .label-req { font-size:11px; color:var(--blue); font-weight:500; }
+    .label-opt { font-size:11px; color:var(--ink4); font-weight:300; }
+    input[type="text"], textarea {
+      width:100%; padding:11px 13px; background:var(--bg);
+      border:1px solid var(--borderMd); border-radius:var(--r);
+      color:var(--ink); font-size:14px; font-family:'DM Sans',sans-serif;
+      outline:none; transition:border-color .15s, box-shadow .15s;
+    }
+    textarea { resize:vertical; min-height:90px; line-height:1.7; }
+    input:focus, textarea:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,87,255,0.08); }
+    input::placeholder, textarea::placeholder { color:var(--ink4); }
+    .field-hint { font-size:11px; color:var(--ink4); margin-top:4px; }
+
+    /* Risk pills */
+    .risk-pills { display:flex; gap:7px; flex-wrap:wrap; }
+    .risk-pill {
+      padding:6px 16px; border-radius:8px; border:1px solid var(--borderMd);
+      background:var(--bg); color:var(--ink3); font-size:12.5px; font-weight:400;
+      font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .15s;
+    }
+    .risk-pill:hover { border-color:rgba(0,0,0,0.22); color:var(--ink); }
+    .risk-pill.sel-critical { border-color:#D94040; background:rgba(217,64,64,0.07); color:#D94040; font-weight:600; }
+    .risk-pill.sel-high     { border-color:#C98A00; background:rgba(201,138,0,0.07);  color:#C98A00; font-weight:600; }
+    .risk-pill.sel-medium   { border-color:#0057FF; background:rgba(0,87,255,0.07);   color:#0057FF; font-weight:600; }
+    .risk-pill.sel-low      { border-color:#1A9E5C; background:rgba(26,158,92,0.07);  color:#1A9E5C; font-weight:600; }
+
+    /* Error */
+    .error-box {
+      display:none; padding:10px 13px; border-radius:8px; margin-bottom:14px;
+      background:rgba(217,64,64,0.06); border:1px solid rgba(217,64,64,0.18);
+      color:var(--red); font-size:13px;
+    }
+
+    /* Generate button */
+    .btn-generate {
+      width:100%; padding:13px; border-radius:var(--r); border:none;
+      background:var(--ink); color:#fff; font-size:15px; font-weight:500;
+      font-family:'DM Sans',sans-serif; cursor:pointer;
+      transition:opacity .15s, transform .2s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .btn-generate:hover:not(:disabled) { opacity:.85; transform:translateY(-1px); }
+    .btn-generate:active:not(:disabled) { transform:translateY(0); }
+    .btn-generate:disabled { opacity:.5; cursor:not-allowed; }
+    .spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,0.25); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:none; }
+
+    /* RESULT */
+    #result-wrap { display:none; }
+    .result-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:0 2px; }
+    .result-bar-left { display:flex; align-items:center; gap:10px; }
+    .result-dot { width:6px; height:6px; border-radius:50%; background:var(--green); display:inline-block; }
+    .result-label { font-size:12px; font-weight:500; color:var(--ink3); }
+    .result-risk-badge { display:none; padding:2px 10px; border-radius:100px; font-size:11.5px; font-weight:600; }
+    .result-actions { display:flex; gap:6px; }
+
+    /* Action buttons */
+    .action-btn {
+      padding:5px 13px; border-radius:7px; border:1px solid var(--borderMd);
+      background:transparent; color:var(--ink3); font-size:12px;
+      font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .15s;
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .action-btn:hover { background:rgba(0,0,0,0.04); color:var(--ink); }
+    .action-btn.copied { color:var(--green); }
+    .action-btn svg { width:12px; height:12px; opacity:.6; flex-shrink:0; }
+    .action-btn-export { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .action-btn-export:hover { background:#2a2a2a; color:#fff; }
+    .action-btn-export svg { opacity:.7; }
+
+    /* Export dropdown */
+    .export-wrap { position:relative; }
+    .export-menu {
+      display:none; position:absolute; top:calc(100% + 6px); right:0;
+      background:var(--card); border:1px solid var(--borderMd);
+      border-radius:10px; padding:6px; min-width:160px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.10); z-index:100;
+    }
+    .export-menu.open { display:block; }
+    .export-item {
+      display:flex; align-items:center; gap:9px; padding:9px 12px;
+      border-radius:7px; cursor:pointer; font-size:13px; color:var(--ink2);
+      transition:background .12s; border:none; background:transparent;
+      width:100%; font-family:'DM Sans',sans-serif; text-align:left;
+    }
+    .export-item:hover { background:var(--bg); }
+    .export-item svg { flex-shrink:0; }
+    .export-item-sub { font-size:11px; color:var(--ink4); margin-left:auto; }
+
+    /* Observation card */
+    .obs-card {
+      background: var(--card); border:1px solid var(--borderMd);
+      border-radius:14px; overflow:hidden;
+      box-shadow:0 2px 20px rgba(0,0,0,0.05);
+    }
+    .obs-title-bar {
+      padding:20px 24px 18px; border-bottom:1px solid var(--border);
+      display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+    }
+    .obs-title {
+      font-family:'Fustat',sans-serif; font-size:18px; font-weight:800;
+      letter-spacing:-.5px; color:var(--ink); line-height:1.2; flex:1;
+    }
+    .copy-title-btn {
+      padding:4px 11px; border-radius:6px; border:1px solid var(--border);
+      background:transparent; color:var(--ink4); font-size:11px;
+      font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .15s; flex-shrink:0; margin-top:2px;
+    }
+    .copy-title-btn:hover { background:rgba(0,0,0,0.04); color:var(--ink3); }
+
+    .obs-section { padding:20px 24px; border-bottom:1px solid var(--border); position:relative; }
+    .obs-section:last-child { border-bottom:none; }
+    .obs-section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .obs-section-label { display:flex; align-items:center; gap:8px; }
+    .obs-section-accent { width:3px; height:16px; border-radius:2px; flex-shrink:0; }
+    .obs-section-name { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .copy-sec-btn {
+      padding:3px 10px; border-radius:6px; border:1px solid var(--border);
+      background:transparent; color:var(--ink4); font-size:11px;
+      font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .15s;
+    }
+    .copy-sec-btn:hover { background:rgba(0,0,0,0.04); color:var(--ink3); }
+    .copy-sec-btn.copied { color:var(--green); border-color:rgba(26,158,92,0.25); }
+
+    .obs-text { font-size:14px; line-height:1.8; color:var(--ink2); font-weight:300; white-space:pre-wrap; padding-left:11px; }
+
+    /* Risk items */
+    .risk-list { display:flex; flex-direction:column; gap:8px; }
+    .risk-item {
+      display:flex; gap:10px; align-items:flex-start;
+      padding:12px 14px; border-radius:9px; border:1px solid;
+      font-size:13.5px; line-height:1.65; font-weight:300;
+    }
+    .risk-item-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+    .risk-item-type { font-weight:600; font-size:12.5px; }
+
+    /* Action plan items */
+    .action-list { display:flex; flex-direction:column; gap:10px; }
+    .action-item {
+      display:flex; gap:12px; align-items:flex-start;
+      padding:14px 16px; border-radius:10px;
+      background:rgba(14,116,144,0.04);
+      border:1px solid rgba(14,116,144,0.15);
+    }
+    .action-num {
+      width:22px; height:22px; border-radius:6px;
+      background:var(--teal); color:#fff;
+      font-size:10px; font-weight:700;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;
+    }
+    .action-content { flex:1; }
+    .action-who {
+      font-size:10.5px; font-weight:600; color:var(--teal);
+      text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;
+    }
+    .action-text { font-size:13.5px; line-height:1.7; color:var(--ink2); font-weight:300; }
+    .action-due {
+      font-size:11px; color:var(--ink4); margin-top:5px;
+      display:flex; align-items:center; gap:5px;
+    }
+    .action-due svg { width:11px; height:11px; }
+
+    /* Disclaimer */
+    .disclaimer {
+      margin-top:14px; padding:12px 16px;
+      background:var(--blueDim); border:1px solid rgba(0,87,255,0.12);
+      border-radius:10px; display:flex; align-items:flex-start; gap:10px;
+    }
+    .disclaimer svg { flex-shrink:0; margin-top:1px; }
+    .disclaimer p { font-size:12.5px; color:var(--ink3); font-weight:300; line-height:1.6; }
+
+    /* Footer */
+    footer { border-top:1px solid var(--border); padding:20px 44px; text-align:center; }
+    footer p { font-size:12px; color:var(--ink4); }
+
+    /* PRINT / EXPORT styles — hidden on screen */
+    #print-area { display:none; }
+    @media print {
+      body > *:not(#print-area) { display:none !important; }
+      #print-area {
+        display:block !important; font-family:'DM Sans',sans-serif;
+        color:#0C0C0C; max-width:720px; margin:0 auto; padding:40px;
+      }
+      #print-area h2 { font-family:'Fustat',sans-serif; font-size:22px; font-weight:800; letter-spacing:-0.5px; margin-bottom:24px; border-bottom:2px solid #0C0C0C; padding-bottom:12px; }
+      #print-area .p-section { margin-bottom:24px; }
+      #print-area .p-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#7A7A7A; margin-bottom:6px; }
+      #print-area .p-body { font-size:13px; line-height:1.8; color:#3A3A3A; font-weight:300; }
+      #print-area .p-risk { margin-bottom:6px; font-size:13px; }
+      #print-area .p-action { margin-bottom:10px; padding:10px 14px; border:1px solid #ddd; border-radius:8px; }
+      #print-area .p-action-label { font-size:10px; font-weight:700; color:#0E7490; text-transform:uppercase; margin-bottom:4px; }
+      #print-area .p-footer { margin-top:40px; font-size:11px; color:#C0C0C0; border-top:1px solid #eee; padding-top:12px; }
+    }
+
+    @media(max-width:600px) {
+      nav { padding:0 20px; }
+      main { padding:40px 16px 80px; }
+      .obs-title-bar, .obs-section { padding:16px 18px; }
+      .result-actions { gap:4px; }
+      footer { padding:20px; }
+    }
+  </style>
+</head>
+<body>
+
+
+<!-- NAV -->
+<header>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M2 10.5L5.5 5L8 8.5L10.5 5.5L13 10.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      Audit Recipe
+    </a>
+    <a href="finding-builder.html" class="nav-link active">Finding Builder</a>
+    <a href="report-builder.html" class="nav-link">Report Builder</a>
+    <a href="compliance-analyzer.html" class="nav-link">Compliance Analyzer</a>
+  </nav>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- Hero -->
+  <div class="hero a1">
+    <div class="hero-badge">
+      <span class="hero-dot"></span>
+      <span>Finding Builder · IIA Standard</span>
+    </div>
+    <h1>Finding<br/>Recipe.</h1>
+    <p>Describe your finding and let AI produce a complete, board-ready audit observation — with summary, specific issues, risks, root cause, and action plans.</p>
+  </div>
+
+  <!-- Input Card -->
+  <div class="input-card a2">
+
+    <!-- 1: Core Finding -->
+    <div class="section-divider" style="margin-top:0;">
+      <div class="section-divider-num">1</div>
+      <span>Core Finding</span>
+    </div>
+    <div class="form-group">
+      <div class="form-label-row">
+        <label for="summary">Observation summary</label>
+        <span class="label-req">* required</span>
+      </div>
+      <textarea id="summary" rows="4" placeholder="Describe the audit finding in your own words. What did you find? What process or control failed?"></textarea>
+    </div>
+    <div class="form-group">
+      <div class="form-label-row">
+        <label for="specific">Specific details / evidence</label>
+        <span class="label-opt">recommended</span>
+      </div>
+      <textarea id="specific" rows="3" placeholder="e.g. Names of products, dates, amounts, regulation articles, affected units, system names..."></textarea>
+      <div class="field-hint">The more detail you add, the more precise the output will be.</div>
+    </div>
+
+    <!-- 2: Risk & Context -->
+    <div class="section-divider">
+      <div class="section-divider-num">2</div>
+      <span>Risk & Context</span>
+    </div>
+    <div class="form-group">
+      <label style="display:block;margin-bottom:8px;">Risk level <span style="color:var(--ink4);font-weight:300;">(optional)</span></label>
+      <div class="risk-pills">
+        <button class="risk-pill" data-risk="Critical" onclick="toggleRisk(this)">Critical</button>
+        <button class="risk-pill" data-risk="High"     onclick="toggleRisk(this)">High</button>
+        <button class="risk-pill" data-risk="Medium"   onclick="toggleRisk(this)">Medium</button>
+        <button class="risk-pill" data-risk="Low"      onclick="toggleRisk(this)">Low</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="form-label-row">
+        <label for="rootcause">Suggested root cause</label>
+        <span class="label-opt">optional</span>
+      </div>
+      <input type="text" id="rootcause" placeholder="e.g. Absence of governance process, no compliance checkpoint before product reactivation..."/>
+    </div>
+    <div class="form-group" style="margin-bottom:22px;">
+      <div class="form-label-row">
+        <label for="regulation">Regulation / policy reference</label>
+        <span class="label-opt">optional</span>
+      </div>
+      <input type="text" id="regulation" placeholder="e.g. SAMA New Banking Products Regulation, Article 9, Paragraph 5..."/>
+    </div>
+
+    <!-- Error -->
+    <div class="error-box" id="error-box"></div>
+
+    <!-- Button -->
+    <button class="btn-generate" id="gen-btn" onclick="generate()">
+      <span id="btn-label">Generate observation</span>
+      <svg id="btn-arrow" viewBox="0 0 13 13" fill="none" width="12" height="12" style="opacity:.6">
+        <path d="M2.5 6.5H10.5M7 3L10.5 6.5L7 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="spinner" id="spinner"></div>
+    </button>
+    <!-- Attempt counter -->
+    <div style="margin-top:14px;">
+      <div id="attempt-bar-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:11.5px;color:var(--ink4);" id="attempt-label">5 of 5 attempts remaining this week</span>
+          <span style="font-size:11px;color:var(--ink4);" id="attempt-reset">Resets Monday</span>
+        </div>
+        <div style="height:4px;background:rgba(0,0,0,0.07);border-radius:100px;overflow:hidden;">
+          <div id="attempt-bar" style="height:100%;border-radius:100px;background:var(--green);transition:width .4s cubic-bezier(.22,1,.36,1),background .3s;width:100%;"></div>
+        </div>
+      </div>
+      <div id="limit-banner" style="display:none;padding:12px 14px;border-radius:9px;background:rgba(217,64,64,0.06);border:1px solid rgba(217,64,64,0.18);margin-top:8px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <svg viewBox="0 0 16 16" fill="none" width="15" height="15" style="flex-shrink:0;margin-top:1px;"><circle cx="8" cy="8" r="7" stroke="#D94040" stroke-width="1.4"/><path d="M8 5v3.5M8 10.5v.1" stroke="#D94040" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#D94040;margin-bottom:2px;">Weekly limit reached</div>
+            <div style="font-size:12px;color:var(--ink3);font-weight:300;line-height:1.5;">You have used all 5 attempts for this week. Your limit resets every Monday at midnight.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <span style="font-size:11.5px;color:var(--ink4);">Tip: <kbd style="font-size:10px;padding:1px 5px;border:1px solid var(--borderMd);border-radius:4px;background:var(--bg);">Ctrl + Enter</kbd> to generate</span>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-wrap">
+
+    <!-- Result topbar -->
+    <div class="result-bar">
+      <div class="result-bar-left">
+        <span class="result-dot"></span>
+        <span class="result-label">Generated observation</span>
+        <span class="result-risk-badge" id="risk-badge"></span>
+      </div>
+      <div class="result-actions">
+        <button class="action-btn" id="copy-all-btn" onclick="copyAll()">
+          <svg viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 10V3a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Copy all
+        </button>
+        <div class="export-wrap">
+          <button class="action-btn action-btn-export" onclick="toggleExportMenu()">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M7 2v7M4 6l3 3 3-3M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export
+            <svg viewBox="0 0 10 10" fill="none" style="width:9px;height:9px;opacity:.5;"><path d="M2 3.5L5 6.5L8 3.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="export-menu" id="export-menu">
+            <button class="export-item" onclick="exportPDF()">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><rect x="2" y="1" width="10" height="13" rx="1.5" stroke="#D94040" stroke-width="1.3"/><path d="M5 5h4M5 8h4M5 11h2" stroke="#D94040" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Export as PDF
+              <span class="export-item-sub">Print dialog</span>
+            </button>
+            <button class="export-item" onclick="exportWord()">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><rect x="2" y="1" width="10" height="13" rx="1.5" stroke="#0057FF" stroke-width="1.3"/><path d="M5 5l1.5 5L8 7l1.5 3L11 5" stroke="#0057FF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Export as Word
+              <span class="export-item-sub">.doc file</span>
+            </button>
+          </div>
+        </div>
+        <button class="action-btn" onclick="resetForm()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Observation card -->
+    <div class="obs-card">
+
+      <!-- Title -->
+      <div class="obs-title-bar">
+        <div class="obs-title" id="obs-title">—</div>
+        <button class="copy-title-btn" onclick="copyField('obs-title',this)">Copy</button>
+      </div>
+
+      <!-- Summary -->
+      <div class="obs-section">
+        <div class="obs-section-header">
+          <div class="obs-section-label">
+            <div class="obs-section-accent" style="background:#0057FF;"></div>
+            <span class="obs-section-name" style="color:#0057FF;">Summary</span>
+          </div>
+          <button class="copy-sec-btn" onclick="copyField('obs-summary',this)">Copy</button>
+        </div>
+        <div class="obs-text" id="obs-summary"></div>
+      </div>
+
+      <!-- Specific Issue -->
+      <div class="obs-section">
+        <div class="obs-section-header">
+          <div class="obs-section-label">
+            <div class="obs-section-accent" style="background:#6B21A8;"></div>
+            <span class="obs-section-name" style="color:#6B21A8;">Specific Issue</span>
+          </div>
+          <button class="copy-sec-btn" onclick="copyField('obs-specific',this)">Copy</button>
+        </div>
+        <div class="obs-text" id="obs-specific"></div>
+      </div>
+
+      <!-- Risks -->
+      <div class="obs-section">
+        <div class="obs-section-header">
+          <div class="obs-section-label">
+            <div class="obs-section-accent" style="background:#D94040;"></div>
+            <span class="obs-section-name" style="color:#D94040;">Risks</span>
+          </div>
+          <button class="copy-sec-btn" onclick="copyRisks(this)">Copy</button>
+        </div>
+        <div class="risk-list" id="obs-risks"></div>
+      </div>
+
+      <!-- Root Cause -->
+      <div class="obs-section">
+        <div class="obs-section-header">
+          <div class="obs-section-label">
+            <div class="obs-section-accent" style="background:#C98A00;"></div>
+            <span class="obs-section-name" style="color:#C98A00;">Root Cause</span>
+          </div>
+          <button class="copy-sec-btn" onclick="copyField('obs-rootcause',this)">Copy</button>
+        </div>
+        <div class="obs-text" id="obs-rootcause"></div>
+      </div>
+
+      <!-- Recommendation & Action Plans -->
+      <div class="obs-section">
+        <div class="obs-section-header">
+          <div class="obs-section-label">
+            <div class="obs-section-accent" style="background:#0E7490;"></div>
+            <span class="obs-section-name" style="color:#0E7490;">Recommendation & Action Plans</span>
+          </div>
+          <button class="copy-sec-btn" onclick="copyActions(this)">Copy</button>
+        </div>
+        <div class="action-list" id="obs-actions"></div>
+      </div>
+
+    </div><!-- /obs-card -->
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      <svg viewBox="0 0 14 14" fill="none" width="14" height="14">
+        <circle cx="7" cy="7" r="6" stroke="#0057FF" stroke-width="1.3"/>
+        <path d="M7 5V7.5M7 9.5V9.4" stroke="#0057FF" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <p>Review with the Chief Audit Executive before formal issuance to management or the board.</p>
+    </div>
+
+  </div><!-- /result-wrap -->
+
+</main>
+
+<!-- PRINT AREA (used for PDF export) -->
+<div id="print-area"></div>
+
+<footer>
+  <p>© 2026 Worrkly · Audit Recipe · Finding Builder</p>
+</footer>
+
+<script>
+  /* ─── Attempt limiter (localStorage, resets Monday) ─── */
+  const WEEKLY_LIMIT = 5;
+
+  function getMondayKey() {
+    const now  = new Date();
+    const day  = now.getDay(); // 0=Sun,1=Mon...
+    const diff = (day === 0 ? -6 : 1 - day); // days back to Monday
+    const mon  = new Date(now);
+    mon.setDate(now.getDate() + diff);
+    return `fr_week_${mon.getFullYear()}_${mon.getMonth()}_${mon.getDate()}`;
+  }
+
+  function getAttempts() {
+    const key  = getMondayKey();
+    const data = JSON.parse(localStorage.getItem('fr_attempts') || '{}');
+    return data[key] || 0;
+  }
+
+  function incrementAttempts() {
+    const key  = getMondayKey();
+    const data = JSON.parse(localStorage.getItem('fr_attempts') || '{}');
+    data[key]  = (data[key] || 0) + 1;
+    // Clean old keys
+    Object.keys(data).forEach(k => { if (k !== key) delete data[k]; });
+    localStorage.setItem('fr_attempts', JSON.stringify(data));
+  }
+
+  function getResetDate() {
+    const now  = new Date();
+    const day  = now.getDay();
+    const diff = day === 0 ? 1 : 8 - day; // days until next Monday
+    const next = new Date(now);
+    next.setDate(now.getDate() + diff);
+    return next.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'short' });
+  }
+
+  function updateAttemptUI() {
+    const used      = getAttempts();
+    const remaining = Math.max(0, WEEKLY_LIMIT - used);
+    const pct       = (remaining / WEEKLY_LIMIT) * 100;
+
+    const label  = document.getElementById('attempt-label');
+    const bar    = document.getElementById('attempt-bar');
+    const banner = document.getElementById('limit-banner');
+    const btn    = document.getElementById('gen-btn');
+    const reset  = document.getElementById('attempt-reset');
+
+    label.textContent = `${remaining} of ${WEEKLY_LIMIT} attempt${remaining !== 1 ? 's' : ''} remaining this week`;
+    bar.style.width   = pct + '%';
+    reset.textContent = `Resets ${getResetDate()}`;
+
+    if (remaining <= 1 && remaining > 0) {
+      bar.style.background = '#C98A00'; // amber — last attempt
+    } else if (remaining === 0) {
+      bar.style.background = '#D94040'; // red — exhausted
+    } else {
+      bar.style.background = '#1A9E5C'; // green — healthy
+    }
+
+    if (remaining === 0) {
+      banner.style.display = 'block';
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      btn.style.cursor  = 'not-allowed';
+    } else {
+      banner.style.display = 'none';
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor  = '';
+    }
+  }
+
+  /* ─── State ─── */
+  let selectedRisk  = '';
+  let currentResult = null;
+
+  const RISK_STYLES = {
+    Critical: { color:'#D94040', dim:'rgba(217,64,64,0.07)',  border:'rgba(217,64,64,0.2)'  },
+    High:     { color:'#C98A00', dim:'rgba(201,138,0,0.07)',  border:'rgba(201,138,0,0.2)'  },
+    Medium:   { color:'#0057FF', dim:'rgba(0,87,255,0.07)',   border:'rgba(0,87,255,0.2)'   },
+    Low:      { color:'#1A9E5C', dim:'rgba(26,158,92,0.07)',  border:'rgba(26,158,92,0.2)'  },
+  };
+
+  const RISK_ITEM_STYLES = {
+    Regulatory:   { color:'#D94040', dim:'rgba(217,64,64,0.05)',  border:'rgba(217,64,64,0.15)'  },
+    Compliance:   { color:'#C98A00', dim:'rgba(201,138,0,0.05)',  border:'rgba(201,138,0,0.15)'  },
+    Reputational: { color:'#6B21A8', dim:'rgba(107,33,168,0.05)', border:'rgba(107,33,168,0.15)' },
+    Operational:  { color:'#0057FF', dim:'rgba(0,87,255,0.05)',   border:'rgba(0,87,255,0.15)'   },
+    Financial:    { color:'#D94040', dim:'rgba(217,64,64,0.05)',  border:'rgba(217,64,64,0.15)'  },
+    Strategic:    { color:'#1A9E5C', dim:'rgba(26,158,92,0.05)',  border:'rgba(26,158,92,0.15)'  },
+  };
+
+  /* ─── Risk pills ─── */
+  function toggleRisk(btn) {
+    const risk = btn.dataset.risk;
+    document.querySelectorAll('.risk-pill').forEach(p => p.className = 'risk-pill');
+    if (selectedRisk === risk) { selectedRisk = ''; return; }
+    selectedRisk = risk;
+    btn.classList.add('sel-' + risk.toLowerCase());
+  }
+
+  /* ─── Loading ─── */
+  function setLoading(on) {
+    const btn = document.getElementById('gen-btn');
+    btn.disabled = on;
+    document.getElementById('btn-label').textContent  = on ? 'Generating...' : 'Generate observation';
+    document.getElementById('btn-arrow').style.display = on ? 'none' : 'inline';
+    document.getElementById('spinner').style.display   = on ? 'inline-block' : 'none';
+  }
+
+  /* ─── Error ─── */
+  function showError(msg) { const b = document.getElementById('error-box'); b.textContent = msg; b.style.display = 'block'; }
+  function hideError()    { const b = document.getElementById('error-box'); b.style.display = 'none'; b.innerHTML = ''; }
+
+  /* ─── Export menu ─── */
+  function toggleExportMenu() {
+    document.getElementById('export-menu').classList.toggle('open');
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.export-wrap')) {
+      document.getElementById('export-menu').classList.remove('open');
+    }
+  });
+
+  /* ─── Copy helpers ─── */
+  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function flashBtn(btn) {
+    const orig = btn.textContent.trim();
+    btn.textContent = '✓ Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig.startsWith('✓') ? 'Copy' : orig; btn.classList.remove('copied'); }, 1500);
+  }
+
+  function copyField(id, btn) {
+    navigator.clipboard.writeText(document.getElementById(id).textContent || '');
+    flashBtn(btn);
+  }
+
+  function copyRisks(btn) {
+    if (!currentResult?.risks) return;
+    navigator.clipboard.writeText(currentResult.risks.map(r => `• ${r.type} Risk: ${r.description}`).join('\n'));
+    flashBtn(btn);
+  }
+
+  function copyActions(btn) {
+    if (!currentResult?.action_plans) return;
+    const text = currentResult.action_plans.map((a,i) => `${i+1}. [${a.owner}] ${a.action}${a.due ? ' — Due: ' + a.due : ''}`).join('\n');
+    navigator.clipboard.writeText(text);
+    flashBtn(btn);
+  }
+
+  function copyAll() {
+    if (!currentResult) return;
+    const r = currentResult;
+    const risks   = (r.risks||[]).map(x => `  • ${x.type} Risk: ${x.description}`).join('\n');
+    const actions = (r.action_plans||[]).map((a,i) => `  ${i+1}. [${a.owner}] ${a.action}${a.due ? ' — Due: ' + a.due : ''}`).join('\n');
+    const full = `Audit Observation: ${r.title}\n\nSummary:\n${r.summary}\n\nSpecific Issue:\n${r.specific_issue}\n\nRisks:\n${risks}\n\nRoot Cause:\n${r.root_cause}\n\nRecommendation & Action Plans:\n${actions}`;
+    navigator.clipboard.writeText(full);
+    const btn = document.getElementById('copy-all-btn');
+    const orig = btn.innerHTML;
+    btn.textContent = '✓ Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 1500);
+  }
+
+  /* ─── Reset ─── */
+  function resetForm() {
+    ['summary','specific','rootcause','regulation'].forEach(id => document.getElementById(id).value = '');
+    document.querySelectorAll('.risk-pill').forEach(p => p.className = 'risk-pill');
+    selectedRisk = ''; currentResult = null;
+    document.getElementById('result-wrap').style.display = 'none';
+    hideError();
+  }
+
+  /* ─── Render risks ─── */
+  function renderRisks(risks) {
+    const c = document.getElementById('obs-risks');
+    c.innerHTML = '';
+    risks.forEach(r => {
+      const s  = RISK_ITEM_STYLES[r.type] || { color:'#7A7A7A', dim:'rgba(0,0,0,0.03)', border:'rgba(0,0,0,0.1)' };
+      const el = document.createElement('div');
+      el.className = 'risk-item';
+      el.style.cssText = `background:${s.dim};border-color:${s.border};color:#3A3A3A;`;
+      el.innerHTML = `<div class="risk-item-dot" style="background:${s.color};"></div>
+        <div><span class="risk-item-type" style="color:${s.color};">${escHtml(r.type)} Risk: </span>${escHtml(r.description)}</div>`;
+      c.appendChild(el);
+    });
+  }
+
+  /* ─── Render action plans ─── */
+  function renderActions(plans) {
+    const c = document.getElementById('obs-actions');
+    c.innerHTML = '';
+    plans.forEach((a, i) => {
+      const el = document.createElement('div');
+      el.className = 'action-item';
+      el.innerHTML = `
+        <div class="action-num">${i + 1}</div>
+        <div class="action-content">
+          <div class="action-who">${escHtml(a.owner || 'Management')}</div>
+          <div class="action-text">${escHtml(a.action)}</div>
+          ${a.due ? `<div class="action-due">
+            <svg viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="1" stroke="#C0C0C0" stroke-width="1.2"/><path d="M4 1v2M8 1v2M1 5h10" stroke="#C0C0C0" stroke-width="1.2" stroke-linecap="round"/></svg>
+            ${escHtml(a.due)}
+          </div>` : ''}
+        </div>`;
+      c.appendChild(el);
+    });
+  }
+
+  /* ─── PDF Export ─── */
+  function exportPDF() {
+    if (!currentResult) return;
+    document.getElementById('export-menu').classList.remove('open');
+    buildPrintArea();
+    window.print();
+  }
+
+  function buildPrintArea() {
+    const r = currentResult;
+    const risks   = (r.risks||[]).map(x => `<div class="p-risk">• <strong>${escHtml(x.type)} Risk:</strong> ${escHtml(x.description)}</div>`).join('');
+    const actions = (r.action_plans||[]).map((a,i) => `
+      <div class="p-action">
+        <div class="p-action-label">${i+1}. ${escHtml(a.owner||'Management')}</div>
+        <div>${escHtml(a.action)}${a.due ? ` <em style="color:#C0C0C0;">— ${escHtml(a.due)}</em>` : ''}</div>
+      </div>`).join('');
+
+    document.getElementById('print-area').innerHTML = `
+      <h2>Audit Observation: ${escHtml(r.title)}</h2>
+      <div class="p-section"><div class="p-label">Summary</div><div class="p-body">${escHtml(r.summary)}</div></div>
+      <div class="p-section"><div class="p-label">Specific Issue</div><div class="p-body">${escHtml(r.specific_issue)}</div></div>
+      <div class="p-section"><div class="p-label">Risks</div>${risks}</div>
+      <div class="p-section"><div class="p-label">Root Cause</div><div class="p-body">${escHtml(r.root_cause)}</div></div>
+      <div class="p-section"><div class="p-label">Recommendation & Action Plans</div>${actions}</div>
+      <div class="p-footer">Generated by Finding Builder · Worrkly Internal Audit Tools · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    `;
+  }
+
+  /* ─── Word Export ─── */
+  function exportWord() {
+    if (!currentResult) return;
+    document.getElementById('export-menu').classList.remove('open');
+    const r = currentResult;
+    const risks   = (r.risks||[]).map(x => `• ${x.type} Risk: ${x.description}`).join('\n');
+    const actions = (r.action_plans||[]).map((a,i) => `${i+1}. [${a.owner||'Management'}] ${a.action}${a.due ? ' — ' + a.due : ''}`).join('\n');
+
+    const content = `Audit Observation: ${r.title}\n\n` +
+      `SUMMARY\n${'─'.repeat(60)}\n${r.summary}\n\n` +
+      `SPECIFIC ISSUE\n${'─'.repeat(60)}\n${r.specific_issue}\n\n` +
+      `RISKS\n${'─'.repeat(60)}\n${risks}\n\n` +
+      `ROOT CAUSE\n${'─'.repeat(60)}\n${r.root_cause}\n\n` +
+      `RECOMMENDATION & ACTION PLANS\n${'─'.repeat(60)}\n${actions}\n\n` +
+      `─`.repeat(60) + `\nGenerated by Finding Builder · Worrkly · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}`;
+
+    /* Use HTML-based .doc so Word opens it with formatting */
+    const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+<head><meta charset="UTF-8"/><title>Audit Observation</title>
+<style>
+  body { font-family: Calibri, sans-serif; font-size: 11pt; color: #0C0C0C; margin: 2cm; }
+  h1   { font-size: 16pt; font-weight: bold; border-bottom: 2px solid #0C0C0C; padding-bottom: 6pt; margin-bottom: 14pt; }
+  h2   { font-size: 10pt; font-weight: bold; color: #7A7A7A; text-transform: uppercase; letter-spacing: 1px; margin: 18pt 0 4pt; }
+  p    { font-size: 11pt; line-height: 1.7; color: #3A3A3A; margin-bottom: 8pt; }
+  .risk-item { margin-bottom: 6pt; }
+  .action-item { margin-bottom: 8pt; padding: 8pt; border: 1px solid #ddd; }
+  .action-owner { font-size: 9pt; color: #0E7490; font-weight: bold; text-transform: uppercase; margin-bottom: 3pt; }
+  .footer-note { margin-top: 30pt; font-size: 9pt; color: #C0C0C0; border-top: 1px solid #eee; padding-top: 8pt; }
+</style></head><body>
+<h1>Audit Observation: ${escHtml(r.title)}</h1>
+<h2>Summary</h2><p>${escHtml(r.summary)}</p>
+<h2>Specific Issue</h2><p>${escHtml(r.specific_issue)}</p>
+<h2>Risks</h2>${(r.risks||[]).map(x=>`<div class="risk-item"><p>• <strong>${escHtml(x.type)} Risk:</strong> ${escHtml(x.description)}</p></div>`).join('')}
+<h2>Root Cause</h2><p>${escHtml(r.root_cause)}</p>
+<h2>Recommendation &amp; Action Plans</h2>${(r.action_plans||[]).map((a,i)=>`<div class="action-item"><div class="action-owner">${i+1}. ${escHtml(a.owner||'Management')}</div><p>${escHtml(a.action)}${a.due?` <em>— ${escHtml(a.due)}</em>`:''}</p></div>`).join('')}
+<div class="footer-note">Generated by Finding Builder · Worrkly Internal Audit Tools · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div>
+</body></html>`;
+
+    const blob = new Blob([html], { type: 'application/msword' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `Audit-Observation-${r.title.replace(/[^a-z0-9]/gi,'-').substring(0,50)}.doc`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* ─── Field highlight helpers ─── */
+  function highlightField(id, isError) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.borderColor  = isError ? '#D94040' : '';
+    el.style.boxShadow    = isError ? '0 0 0 3px rgba(217,64,64,0.08)' : '';
+  }
+  function clearHighlights() {
+    ['summary','specific'].forEach(id => highlightField(id, false));
+  }
+
+  /* ─── Show validation card ─── */
+  function showValidationError(message, hint) {
+    const box = document.getElementById('error-box');
+    box.innerHTML = `
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <svg viewBox="0 0 16 16" fill="none" width="16" height="16" style="flex-shrink:0;margin-top:1px;">
+          <circle cx="8" cy="8" r="7" stroke="#D94040" stroke-width="1.4"/>
+          <path d="M8 5v3.5M8 10.5v.1" stroke="#D94040" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <div style="font-weight:600;margin-bottom:3px;">${escHtml(message)}</div>
+          ${hint ? `<div style="font-size:12px;color:#7A7A7A;font-weight:300;line-height:1.5;">${escHtml(hint)}</div>` : ''}
+        </div>
+      </div>`;
+    box.style.display = 'block';
+    box.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
+  /* ─── Generate ─── */
+  async function generate() {
+    const summary    = document.getElementById('summary').value.trim();
+    const specific   = document.getElementById('specific').value.trim();
+    const rootCause  = document.getElementById('rootcause').value.trim();
+    const regulation = document.getElementById('regulation').value.trim();
+    hideError();
+    clearHighlights();
+
+    /* ── Attempt limit check ── */
+    if (getAttempts() >= WEEKLY_LIMIT) {
+      updateAttemptUI();
+      return;
+    }
+
+    /* ── Client-side validation ── */
+    if (!summary) {
+      highlightField('summary', true);
+      showValidationError(
+        'Observation summary is required.',
+        'Describe what you found during the audit — e.g. "The bank reintroduced products that were inactive for over 12 months without notifying SAMA."'
+      );
+      document.getElementById('summary').focus();
+      return;
+    }
+
+    if (summary.length < 30) {
+      highlightField('summary', true);
+      showValidationError(
+        'Summary is too short to generate a meaningful observation.',
+        'Please describe the finding in more detail — include what happened, which process or control failed, and where the issue was found.'
+      );
+      document.getElementById('summary').focus();
+      return;
+    }
+
+    setLoading(true);
+    document.getElementById('result-wrap').style.display = 'none';
+
+    /* ── System prompt with built-in validation ── */
+    const systemPrompt = `You are a senior Certified Internal Auditor (CIA) helping auditors write professional audit observations following IIA International Standards.
+
+FIRST — validate whether the input describes a genuine audit finding:
+- It must describe a control weakness, process failure, policy breach, regulatory violation, or operational gap.
+- It must be specific enough to identify WHAT went wrong and WHERE.
+- Vague, random, or non-audit inputs (e.g. "hello", "test", "the sky is blue", random words, gibberish) must be rejected.
+
+If the input is NOT a valid audit finding, return ONLY this JSON:
+{
+  "valid": false,
+  "reason": "One clear sentence explaining why this is not a valid audit finding.",
+  "hint": "A specific, helpful suggestion telling the auditor exactly what information to include. Give a concrete example relevant to their input if possible."
+}
+
+If the input IS a valid audit finding, return ONLY this JSON (no preamble, no markdown):
+{
+  "valid": true,
+  "title": "Concise, professional observation title",
+  "summary": "Thorough paragraph: what was found, what control/process failed, and why it matters. Reference specific names, dates, amounts, or regulation articles if provided.",
+  "specific_issue": "Detailed evidence paragraph with specific product names, dates, regulation references, data points. This is the factual proof section. If evidence details are provided, incorporate them precisely.",
+  "risks": [
+    { "type": "Regulatory", "description": "specific risk description tied to this finding" }
+  ],
+  "root_cause": "Thorough paragraph explaining the systemic, process, or governance failure that allowed this issue to occur. Be specific about missing controls or oversight.",
+  "action_plans": [
+    { "owner": "Responsible party e.g. Compliance Department", "action": "Specific measurable remediation action", "due": "Realistic timeframe e.g. Within 30 days or Q3 2025" }
+  ]
+}
+
+Risk types (pick 3–5 most relevant): Regulatory, Compliance, Reputational, Operational, Financial, Strategic.
+Action plans: 3–5 specific actionable items with clear owners and realistic timelines.
+Write at senior audit professional level. Be precise, never generic.`;
+
+    const userPrompt = [
+      `Observation Summary: ${summary}`,
+      specific    ? `Specific Details / Evidence: ${specific}` : '',
+      selectedRisk ? `Overall Risk Level: ${selectedRisk}` : '',
+      rootCause   ? `Suggested Root Cause: ${rootCause}` : '',
+      regulation  ? `Regulation / Policy Reference: ${regulation}` : '',
+    ].filter(Boolean).join('\n');
+
+    try {
+      const res  = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }],
+        }),
+      });
+
+      const data = await res.json();
+      const raw  = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(raw);
+
+      /* ── Handle invalid input flagged by Claude ── */
+      if (parsed.valid === false) {
+        highlightField('summary', true);
+        showValidationError(parsed.reason || 'Input does not appear to be an audit finding.', parsed.hint || '');
+        setLoading(false);
+        return;
+      }
+
+      currentResult = parsed;
+
+      /* ── Count this attempt ── */
+      incrementAttempts();
+      updateAttemptUI();
+
+      /* ── Save to history ── */
+      const historyEntry = {
+        id:        Date.now(),
+        timestamp: new Date().toISOString(),
+        input: {
+          summary:    summary,
+          specific:   specific   || '',
+          rootCause:  rootCause  || '',
+          regulation: regulation || '',
+          riskLevel:  selectedRisk || '',
+        },
+        result: currentResult,
+      };
+      const history = JSON.parse(localStorage.getItem('fr_history') || '[]');
+      history.unshift(historyEntry); // newest first
+      // Keep max 500 entries
+      if (history.length > 500) history.splice(500);
+      localStorage.setItem('fr_history', JSON.stringify(history));
+
+      /* ── Render ── */
+      document.getElementById('obs-title').textContent     = currentResult.title         || '—';
+      document.getElementById('obs-summary').textContent   = currentResult.summary        || '';
+      document.getElementById('obs-specific').textContent  = currentResult.specific_issue || '';
+      document.getElementById('obs-rootcause').textContent = currentResult.root_cause     || '';
+      renderRisks(currentResult.risks        || []);
+      renderActions(currentResult.action_plans || []);
+
+      /* Risk badge */
+      const badge = document.getElementById('risk-badge');
+      if (selectedRisk) {
+        const s = RISK_STYLES[selectedRisk];
+        Object.assign(badge.style, {
+          display:'inline-block', background:s.dim,
+          border:`1px solid ${s.border}`, color:s.color,
+          padding:'2px 10px', borderRadius:'100px',
+          fontSize:'11.5px', fontWeight:'600',
+        });
+        badge.textContent = selectedRisk;
+      } else { badge.style.display = 'none'; }
+
+      document.getElementById('result-wrap').style.display = 'block';
+      setTimeout(() => document.getElementById('result-wrap').scrollIntoView({ behavior:'smooth', block:'start' }), 80);
+
+    } catch(e) {
+      showValidationError('Something went wrong.', `Check your API key is saved correctly and try again. Error: ${e?.message || 'Unknown'}`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /* ─── Init attempt UI on load ─── */
+  document.addEventListener('DOMContentLoaded', updateAttemptUI);
+  // Also run immediately in case DOMContentLoaded already fired
+  if (document.readyState !== 'loading') updateAttemptUI();
+
+  /* Clear red border when user starts typing again */
+  document.getElementById('summary').addEventListener('input', () => {
+    highlightField('summary', false);
+    hideError();
+  });
+
+  /* Ctrl+Enter */
+  document.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') generate(); });
+</script>
+</body>
+</html>

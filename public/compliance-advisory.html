@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compliance Advisory — Audit Recipe</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fustat:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#F9F9F8;--card:#FFFFFF;--ink:#0C0C0C;--ink2:#3A3A3A;--ink3:#7A7A7A;--ink4:#C0C0C0;--border:rgba(0,0,0,0.07);--borderMd:rgba(0,0,0,0.11);--blue:#0057FF;--red:#D94040;--green:#1A9E5C;--amber:#D97706;--purple:#7C3AED;--r:10px;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;}
+    header{border-bottom:1px solid var(--border);background:rgba(249,249,248,0.9);backdrop-filter:blur(24px);position:sticky;top:0;z-index:100;}
+    nav{max-width:1200px;margin:0 auto;padding:0 44px;display:flex;align-items:center;height:58px;gap:8px;}
+    .nav-logo{font-family:'Fustat',sans-serif;font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-0.5px;display:flex;align-items:center;gap:9px;text-decoration:none;}
+    .nav-logo-icon{width:32px;height:32px;background:var(--ink);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+    .nav-logo-icon svg{width:18px;height:18px;fill:white;}
+    .badge-new{background:#0057FF;color:white;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;}
+    .nav-links{display:flex;gap:4px;margin-left:auto;}
+    .nav-link{font-size:13px;color:var(--ink3);text-decoration:none;padding:6px 12px;border-radius:7px;transition:all 0.15s;}
+    .nav-link:hover{background:var(--border);color:var(--ink);}
+    .nav-link.active{background:var(--ink);color:white;}
+    .app-layout{display:flex;flex:1;max-width:1200px;margin:0 auto;width:100%;padding:32px 44px 80px;gap:28px;}
+    .sidebar{width:260px;flex-shrink:0;}
+    .sidebar-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+    .sidebar-card-header{padding:16px;border-bottom:1px solid var(--border);background:#FAFAFA;}
+    .sidebar-card-header h3{font-size:12px;font-weight:600;color:var(--ink);text-transform:uppercase;letter-spacing:0.5px;}
+    .sidebar-card-header p{font-size:11px;color:var(--ink3);margin-top:3px;}
+    .db-status{display:flex;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border);}
+    .db-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+    .db-count{font-size:12px;color:var(--ink2);}
+    .reg-list{max-height:340px;overflow-y:auto;}
+    .reg-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:all 0.15s;border-bottom:1px solid var(--border);}
+    .reg-item:last-child{border-bottom:none;}
+    .reg-item:hover{background:#F5F5F5;}
+    .reg-item.selected{background:#EEF3FF;}
+    .reg-check{width:16px;height:16px;border:1.5px solid var(--ink4);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;}
+    .reg-item.selected .reg-check{background:var(--blue);border-color:var(--blue);}
+    .reg-check svg{width:10px;height:10px;stroke:white;display:none;}
+    .reg-item.selected .reg-check svg{display:block;}
+    .reg-info{flex:1;min-width:0;}
+    .reg-name{font-size:12px;color:var(--ink2);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .reg-meta{font-size:10px;color:var(--ink4);margin-top:1px;}
+    .reg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+    .select-all-btn{width:100%;padding:10px 16px;border:none;background:none;font-size:12px;color:var(--blue);cursor:pointer;font-family:inherit;text-align:left;border-top:1px solid var(--border);}
+    .empty-regs{padding:24px 16px;text-align:center;color:var(--ink3);font-size:12px;}
+    .main-content{flex:1;min-width:0;}
+    .page-header{margin-bottom:28px;}
+    .page-header h1{font-family:'Fustat',sans-serif;font-weight:800;font-size:26px;color:var(--ink);letter-spacing:-0.5px;}
+    .page-header p{font-size:14px;color:var(--ink3);margin-top:6px;line-height:1.6;}
+    .search-box{background:var(--card);border:1.5px solid var(--borderMd);border-radius:12px;padding:20px;margin-bottom:24px;transition:border-color 0.2s;}
+    .search-box:focus-within{border-color:var(--blue);}
+    .search-box textarea{width:100%;border:none;outline:none;font-size:15px;font-family:inherit;color:var(--ink);resize:none;min-height:60px;max-height:160px;line-height:1.6;background:transparent;}
+    .search-box textarea::placeholder{color:var(--ink4);}
+    .search-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+    .search-hint{font-size:12px;color:var(--ink3);}
+    .search-hint span{color:var(--blue);}
+    .btn-search{padding:10px 24px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:opacity 0.15s;}
+    .btn-search:hover{opacity:0.85;}
+    .btn-search:disabled{opacity:0.4;cursor:not-allowed;}
+    .quick-section{margin-bottom:28px;}
+    .quick-section-title{font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+    .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .quick-chip{padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:9px;font-size:13px;color:var(--ink2);cursor:pointer;transition:all 0.15s;text-align:left;font-family:inherit;line-height:1.4;}
+    .quick-chip:hover{border-color:var(--blue);color:var(--blue);background:#EEF3FF;}
+    .loading-state{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:40px;text-align:center;display:none;}
+    .loading-state.show{display:block;}
+    .loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loading-label{font-size:14px;color:var(--ink3);}
+    .result-section{display:none;}
+    .result-section.show{display:block;}
+    .result-question{font-size:13px;color:var(--ink3);margin-bottom:16px;font-style:italic;}
+    .result-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+    .result-card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#FAFAFA;}
+    .result-card-title{font-size:13px;font-weight:600;color:var(--ink);}
+    .result-card-badges{display:flex;gap:8px;align-items:center;}
+    .confidence-pill{display:flex;align-items:center;gap:6px;background:white;border:1px solid var(--border);border-radius:40px;padding:4px 10px;}
+    .confidence-label{font-size:11px;color:var(--ink3);}
+    .confidence-track{width:60px;height:4px;background:#E5E5E5;border-radius:99px;overflow:hidden;}
+    .confidence-fill{height:100%;background:var(--blue);border-radius:99px;}
+    .confidence-pct{font-size:11px;font-weight:600;color:var(--blue);}
+    .risk-badge{padding:4px 10px;border-radius:40px;font-size:11px;font-weight:600;}
+    .risk-badge.critical{background:#FEE2E2;color:var(--red);}
+    .risk-badge.high{background:#FFEDD5;color:#C2410C;}
+    .risk-badge.medium{background:#FEF3C7;color:var(--amber);}
+    .risk-badge.low{background:#D1FAE5;color:var(--green);}
+    .risk-badge.none{background:#F3F4F6;color:var(--ink3);}
+    .result-answer{padding:20px;font-size:14px;color:var(--ink2);line-height:1.75;border-bottom:1px solid var(--border);}
+    .result-answer strong{color:var(--ink);}
+    .citations-section{padding:16px 20px;}
+    .citations-title{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;}
+    .citation-card{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px;}
+    .citation-header{padding:10px 14px;background:#FAFAFA;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+    .citation-icon{width:28px;height:28px;background:#EEF3FF;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .citation-icon svg{width:14px;height:14px;stroke:var(--blue);}
+    .citation-reg{font-size:12px;font-weight:600;color:var(--ink);flex:1;}
+    .citation-meta{font-size:11px;color:var(--ink3);}
+    .citation-clause{display:inline-block;background:#EEF3FF;color:var(--blue);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;}
+    .citation-body{padding:10px 14px;}
+    .citation-excerpt{font-size:12px;color:var(--ink2);line-height:1.6;font-style:italic;border-left:3px solid var(--blue);padding-left:10px;}
+    .related-section{padding:0 20px 16px;}
+    .related-title{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+    .related-tags{display:flex;gap:6px;flex-wrap:wrap;}
+    .related-tag{padding:4px 10px;background:#F3F4F6;border-radius:20px;font-size:11px;color:var(--ink3);}
+    .disclaimer{margin-top:16px;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:12px 16px;font-size:12px;color:var(--amber);display:flex;align-items:center;gap:8px;}
+    .btn-new-search{display:flex;align-items:center;gap:6px;padding:9px 18px;border:1px solid var(--borderMd);border-radius:8px;font-size:13px;color:var(--ink2);cursor:pointer;background:var(--card);font-family:inherit;margin-bottom:16px;}
+    .no-results{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:48px;text-align:center;}
+    .no-results p{font-size:14px;color:var(--ink3);margin-top:8px;}
+    footer{border-top:1px solid var(--border);padding:32px 44px;background:var(--card);margin-top:auto;}
+    .footer-inner{max-width:1200px;margin:0 auto;}
+    .footer-top{display:flex;gap:48px;margin-bottom:24px;}    .footer-brand h4{font-family:'Fustat',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px;}
+    .footer-brand p{font-size:12px;color:var(--ink3);line-height:1.6;max-width:260px;}
+    .footer-col h5{font-size:11px;font-weight:600;color:var(--ink);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+    .footer-col p,.footer-col a{font-size:12px;color:var(--ink3);text-decoration:none;display:block;margin-bottom:5px;line-height:1.6;}
+    .footer-divider{border:none;border-top:1px solid var(--border);margin-bottom:16px;}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;}
+    .footer-bottom p{font-size:11px;color:var(--ink4);}
+    .footer-tc{font-size:11px;color:var(--blue);cursor:pointer;text-decoration:underline;}
+    .tc-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;align-items:center;justify-content:center;padding:20px;}
+    .tc-overlay.show{display:flex;}
+    .tc-modal{background:var(--card);border-radius:14px;width:100%;max-width:700px;max-height:85vh;overflow-y:auto;padding:36px;}
+    .tc-modal h2{font-family:'Fustat',sans-serif;font-size:22px;font-weight:800;color:var(--ink);margin-bottom:8px;}
+    .tc-modal .tc-date{font-size:12px;color:var(--ink3);margin-bottom:24px;}
+    .tc-section{margin-bottom:20px;}
+    .tc-section h3{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+    .tc-section p{font-size:13px;color:var(--ink2);line-height:1.7;}
+    .tc-highlight{background:#D1FAE5;border-left:3px solid var(--green);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;}
+    .tc-highlight p{font-size:13px;color:#065F46;font-weight:500;}
+    .tc-close{width:100%;padding:12px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:24px;}
+  </style>
+</head>
+<body>
+<header><nav>
+  <a class="nav-logo" href="index.html"><div class="nav-logo-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>Audit Recipe</a>
+  <span class="badge-new">NEW</span>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Home</a>
+    <a class="nav-link" href="finding-builder.html">Finding Builder</a>
+    <a class="nav-link" href="report-builder.html">Report Builder</a>
+    <a class="nav-link" href="standards-ai.html">StandardsAI</a>
+    <a class="nav-link active" href="compliance-advisory.html">Compliance Advisory</a>
+  </div>
+</nav></header>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-card-header"><h3>Regulation Database</h3><p>Select which regulations to search</p></div>
+      <div class="db-status"><div class="db-dot" id="dbDot"></div><span class="db-count" id="dbCount">Loading...</span></div>
+      <div class="reg-list" id="regList"><div class="empty-regs">No regulations uploaded yet.<br>Contact your administrator.</div></div>
+      <button class="select-all-btn" onclick="toggleSelectAll()">Select / Deselect All</button>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-card-header"><h3>Categories</h3></div>
+      <div id="categoryList" style="padding:8px;display:flex;flex-wrap:wrap;gap:6px;"><span style="font-size:11px;color:var(--ink3);padding:8px;">Loading...</span></div>
+    </div>
+  </aside>
+  <div class="main-content">
+    <div class="page-header"><h1>Compliance Advisory</h1><p>Ask any compliance or regulatory question. The AI searches the uploaded regulation database and returns a structured answer with exact citations.</p></div>
+    <div id="searchState">
+      <div class="search-box">
+        <textarea id="questionInput" placeholder="Ask a compliance question in English or Arabic...&#10;&#10;Example: What are SAMA's board independence requirements?" rows="3" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="search-footer">
+          <span class="search-hint">Press <span>Ctrl+Enter</span> to submit · Responds in the language you write in</span>
+          <button class="btn-search" id="searchBtn" onclick="submitQuestion()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Get Advisory
+          </button>
+        </div>
+      </div>
+      <div class="quick-section">
+        <div class="quick-section-title">Suggested Questions</div>
+        <div class="quick-grid">
+          <button class="quick-chip" onclick="fillQuestion(this.textContent)">What are SAMA's board independence requirements?</button>
+          <button class="quick-chip" onclick="fillQuestion(this.textContent)">What is the minimum LCR ratio under Basel III?</button>
+          <button class="quick-chip" onclick="fillQuestion(this.textContent)">What must be disclosed in Pillar 3 for remuneration?</button>
+          <button class="quick-chip" onclick="fillQuestion(this.textContent)">What are the AML customer due diligence requirements?</button>
+          <button class="quick-chip" onclick="fillQuestion(this.textContent)">What are the variable pay deferral requirements for MRTs?</button>
+          <button class="quick-chip" onclick="fillQuestion(this.textContent)">ما هي متطلبات حوكمة مجلس الإدارة وفقاً لنظام ساما؟</button>
+        </div>
+      </div>
+    </div>
+    <div class="loading-state" id="loadingState"><div class="loading-spinner"></div><p class="loading-label" id="loadingLabel">Searching regulation database...</p></div>
+    <div class="result-section" id="resultSection">
+      <button class="btn-new-search" onclick="newSearch()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>New Question</button>
+      <p class="result-question" id="resultQuestion"></p>
+      <div id="resultCard"></div>
+      <div class="disclaimer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>This is advisory only. Consult qualified legal counsel for binding interpretation.</div>
+    </div>
+  </div>
+</div><footer><div class="footer-inner"><div class="footer-top"><div class="footer-brand"><h4>Audit Recipe</h4><p>AI-powered tools designed for internal auditors and compliance officers. Built to assist, not replace, professional judgment.</p></div><div class="footer-col"><h5>Tools</h5><a href="finding-builder.html">Finding Builder</a><a href="report-builder.html">Report Builder</a><a href="standards-ai.html">StandardsAI</a><a href="compliance-advisory.html">Compliance Advisory</a></div><div class="footer-col"><h5>Privacy Commitment</h5><p>🔒 Zero data storage</p><p>No logs retained</p><p>No results stored</p><p>Session only processing</p></div><div class="footer-col"><h5>Legal</h5><a href="#" onclick="openTC()">Terms &amp; Conditions</a><a href="#" onclick="openTC()">Privacy Policy</a><p style="margin-top:8px;font-size:11px;color:var(--ink4)">For professional use by auditors and compliance officers only.</p></div></div><hr class="footer-divider"/><div class="footer-bottom"><p>© 2026 Audit Recipe. All rights reserved.</p><span class="footer-tc" onclick="openTC()">Terms &amp; Conditions</span></div></div></footer>
+<div class="tc-overlay" id="tcOverlay" onclick="if(event.target===this)closeTC()">
+  <div class="tc-modal">
+    <h2>Terms &amp; Conditions</h2><p class="tc-date">Effective Date: January 2026</p>
+    <div class="tc-section"><h3>1. Purpose &amp; Intended Users</h3><p>Audit Recipe is a professional tool designed exclusively to assist internal auditors, compliance officers, and regulatory professionals in their work. It is not intended for general public use or as a substitute for qualified legal or regulatory advice.</p></div>
+    <div class="tc-section"><h3>2. Data Privacy — No Storage Policy</h3><div class="tc-highlight"><p>🔒 Audit Recipe does not store, retain, log, or transmit any user-submitted data, queries, documents, or results. All processing occurs within your session only and is discarded immediately upon completion. No database of user activity is maintained. No query history is recorded. Your work is your own.</p></div><p>Uploaded documents and questions are processed in real-time solely to generate your requested output. They are never written to any persistent storage, never shared with third parties, and never used to train or improve any AI model.</p></div>
+    <div class="tc-section"><h3>3. Advisory Nature of Outputs</h3><p>All outputs generated by Audit Recipe are for informational and professional assistance purposes only. They do not constitute legal advice, regulatory rulings, or binding determinations. Always consult qualified legal counsel for binding interpretation of any regulation or standard.</p></div>
+    <div class="tc-section"><h3>4. Professional Responsibility</h3><p>Users are responsible for verifying all outputs against primary regulatory sources. Audit Recipe assists in identifying potential compliance issues but does not replace the professional judgment of a qualified auditor or compliance officer.</p></div>
+    <div class="tc-section"><h3>5. Regulation Database</h3><p>The regulation database is maintained by your organization's administrator. The accuracy of advisory responses depends on the regulations uploaded to the system.</p></div>
+    <div class="tc-section"><h3>6. Limitation of Liability</h3><p>Audit Recipe and its operators accept no liability for decisions made on the basis of outputs generated by this tool. Users assume full responsibility for any actions taken in reliance on tool outputs.</p></div>
+    <button class="tc-close" onclick="closeTC()">I Understand — Close</button>
+  </div>
+</div><script>
+let regulations=[],selectedRegIds=new Set(),allSelected=true;
+loadRegulations();
+async function loadRegulations(){
+  try{
+    const r=await fetch('/api/regulations');
+    const data=await r.json();
+    regulations=data.regulations||[];
+    renderRegulations();renderCategories();
+  }catch(e){
+    document.getElementById('dbCount').textContent='Demo mode';
+    document.getElementById('dbDot').style.background='var(--amber)';
+    regulations=[{id:'d1',title:'SAMA Corporate Governance Framework',issuer:'SAMA',version:'2021',category:'governance'},
+      {id:'d2',title:'Basel III — Pillar 3',issuer:'BCBS',version:'2023',category:'capital'},
+      {id:'d3',title:'SAMA AML/CTF Rules',issuer:'SAMA',version:'2023',category:'aml'},
+      {id:'d4',title:'SAMA Remuneration Principles',issuer:'SAMA',version:'2022',category:'remuneration'},
+      {id:'d5',title:'IFRS 9 — Financial Instruments',issuer:'IASB',version:'2018',category:'reporting'},
+      {id:'d6',title:'SAMA Cybersecurity Framework',issuer:'SAMA',version:'2023',category:'cyber'}];
+    renderRegulations();renderCategories();
+  }
+}
+function renderRegulations(){
+  const list=document.getElementById('regList');
+  const count=document.getElementById('dbCount');
+  if(!regulations.length){list.innerHTML='<div class="empty-regs">No regulations uploaded yet.<br>Contact your administrator.</div>';count.textContent='0 regulations';document.getElementById('dbDot').style.background='var(--ink4)';return;}
+  count.textContent=regulations.length+' regulation'+(regulations.length!==1?'s':'')+' loaded';
+  selectedRegIds=new Set(regulations.map(r=>r.id));
+  const cc={governance:'#0057FF',capital:'#D97706',aml:'#D94040',remuneration:'#7C3AED',reporting:'#1A9E5C',cyber:'#0891B2',general:'#6B7280'};
+  list.innerHTML=regulations.map(r=>`<div class="reg-item selected" id="ri_${r.id}" onclick="toggleReg('${r.id}')"><div class="reg-dot" style="background:${cc[r.category]||'#6B7280'}"></div><div class="reg-info"><div class="reg-name">${r.title}</div><div class="reg-meta">${r.issuer} · ${r.version}</div></div><div class="reg-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></div>`).join('');
+}
+function renderCategories(){
+  const cats={};
+  regulations.forEach(r=>{cats[r.category]=(cats[r.category]||0)+1;});
+  const cb={governance:'#EEF3FF',capital:'#FEF3C7',aml:'#FEE2E2',remuneration:'#F3E8FF',reporting:'#D1FAE5',cyber:'#E0F2FE',general:'#F3F4F6'};
+  const ct={governance:'#0057FF',capital:'#D97706',aml:'#D94040',remuneration:'#7C3AED',reporting:'#1A9E5C',cyber:'#0891B2',general:'#6B7280'};
+  document.getElementById('categoryList').innerHTML=Object.entries(cats).map(([c,n])=>`<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${cb[c]||'#F3F4F6'};color:${ct[c]||'#6B7280'}">${c} (${n})</span>`).join('');
+}
+function toggleReg(id){
+  const el=document.getElementById('ri_'+id);
+  if(selectedRegIds.has(id)){selectedRegIds.delete(id);el.classList.remove('selected');}else{selectedRegIds.add(id);el.classList.add('selected');}
+}
+function toggleSelectAll(){
+  if(selectedRegIds.size===regulations.length){selectedRegIds.clear();document.querySelectorAll('.reg-item').forEach(e=>e.classList.remove('selected'));}
+  else{regulations.forEach(r=>selectedRegIds.add(r.id));document.querySelectorAll('.reg-item').forEach(e=>e.classList.add('selected'));}
+}
+function fillQuestion(text){const ta=document.getElementById('questionInput');ta.value=text;autoResize(ta);}
+function handleKey(e){if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();submitQuestion();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,160)+'px';}
+async function submitQuestion(){
+  const q=document.getElementById('questionInput').value.trim();
+  if(!q)return;
+  if(selectedRegIds.size===0){alert('Please select at least one regulation.');return;}
+  trackUsage('compliance_advisory','question_asked',{questionLength:q.length,regulationCount:selectedRegIds.size});
+  document.getElementById('searchState').style.display='none';
+  document.getElementById('loadingState').classList.add('show');
+  document.getElementById('resultSection').classList.remove('show');
+  document.getElementById('searchBtn').disabled=true;
+  const labels=['Searching regulation database...','Analyzing relevant clauses...','Generating structured advisory...'];
+  let li=0;const iv=setInterval(()=>{document.getElementById('loadingLabel').textContent=labels[li++%labels.length];},1200);
+  try{
+    const r=await fetch('/api/advisory',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,regulationIds:Array.from(selectedRegIds)})});
+    const data=await r.json();clearInterval(iv);renderResult(q,data);
+    trackUsage('compliance_advisory','result_shown',{citationCount:data.citations?.length||0,confidence:data.confidence||0});
+  }catch(e){clearInterval(iv);renderError(q);}
+  document.getElementById('loadingState').classList.remove('show');
+  document.getElementById('searchBtn').disabled=false;
+}function renderResult(q,data){
+  document.getElementById('resultQuestion').textContent='❝ '+q+' ❞';
+  const rc=data.riskFlag||'none';
+  const rl={critical:'🔴 Critical Risk',high:'🟠 High Risk',medium:'🟡 Medium Risk',low:'🟢 Low Risk',none:'No Risk Flag'};
+  const cp=Math.min(100,Math.max(0,data.confidence||0));
+  const ans=(data.answer||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  const cites=(data.citations||[]).map(c=>`<div class="citation-card"><div class="citation-header"><div class="citation-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div class="citation-reg">${c.regulation}</div><div class="citation-meta">${c.issuer} · ${c.version}</div></div><span class="citation-clause">${c.clause}</span></div><div class="citation-body"><p class="citation-excerpt">"${c.excerpt}"</p></div></div>`).join('');
+  const rel=(data.relatedClauses||[]).length?`<div class="related-section"><div class="related-title">Related Clauses</div><div class="related-tags">${data.relatedClauses.map(c=>`<span class="related-tag">${c}</span>`).join('')}</div></div>`:'';
+  document.getElementById('resultCard').innerHTML=`<div class="result-card"><div class="result-card-header"><span class="result-card-title">Advisory Response</span><div class="result-card-badges"><div class="confidence-pill"><span class="confidence-label">Confidence</span><div class="confidence-track"><div class="confidence-fill" style="width:${cp}%"></div></div><span class="confidence-pct">${cp}%</span></div><span class="risk-badge ${rc}">${rl[rc]||rc}</span></div></div><div class="result-answer">${ans}</div>${cites?`<div class="citations-section"><div class="citations-title">Sources &amp; Citations (${(data.citations||[]).length})</div>${cites}</div>`:''}${rel}</div>`;
+  document.getElementById('resultSection').classList.add('show');
+}
+function renderError(q){
+  document.getElementById('resultQuestion').textContent='❝ '+q+' ❞';
+  document.getElementById('resultCard').innerHTML='<div class="no-results"><p>Could not generate a response. Please check your connection and try again.</p></div>';
+  document.getElementById('resultSection').classList.add('show');
+}
+function newSearch(){
+  document.getElementById('resultSection').classList.remove('show');
+  document.getElementById('searchState').style.display='block';
+  document.getElementById('questionInput').value='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function trackUsage(tool,action,metadata){
+  try{await fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tool,action,metadata})});}catch(e){}
+}
+function openTC(){document.getElementById('tcOverlay').classList.add('show');}
+function closeTC(){document.getElementById('tcOverlay').classList.remove('show');}
+</script></body></html>

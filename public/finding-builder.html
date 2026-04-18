@@ -45,15 +45,11 @@
       backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
       border-bottom: 1px solid var(--border);
     }
-    nav { max-width: 1100px; margin: 0 auto; padding: 0 44px; display: flex; align-items: center; height: 58px; }
-    .nav-logo {
-      font-family: 'Fustat', sans-serif; font-weight: 800; font-size: 16px;
-      color: var(--ink); letter-spacing: -0.5px; text-decoration: none;
-      display: flex; align-items: center; gap: 9px; margin-right: auto;
-    }
-    .logo-icon { width:28px; height:28px; border-radius:7px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
-    .logo-icon svg { width:14px; height:14px; }
-    .nav-pill { font-size:11.5px; font-weight:500; color:var(--ink4); padding:4px 12px; border:1px solid var(--borderMd); border-radius:100px; }
+    
+    
+    
+    
+    
 
     /* LAYOUT */
     main { max-width: 760px; margin: 0 auto; padding: 56px 24px 100px; }
@@ -273,8 +269,8 @@
     .disclaimer p { font-size:12.5px; color:var(--ink3); font-weight:300; line-height:1.6; }
 
     /* Footer */
-    footer { border-top:1px solid var(--border); padding:20px 44px; text-align:center; }
-    footer p { font-size:12px; color:var(--ink4); }
+    
+    
 
     /* PRINT / EXPORT styles — hidden on screen */
     #print-area { display:none; }
@@ -295,11 +291,46 @@
     }
 
     @media(max-width:600px) {
-      nav { padding:0 20px; }
+      
       main { padding:40px 16px 80px; }
       .obs-title-bar, .obs-section { padding:16px 18px; }
       .result-actions { gap:4px; }
-      footer { padding:20px; }
+      
+    }
+  
+    /* unified nav */
+    nav{max-width:1100px;margin:0 auto;padding:0 44px;display:flex;align-items:center;height:58px;}
+    .nav-logo{font-family:'Fustat',sans-serif;font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-0.5px;text-decoration:none;display:flex;align-items:center;gap:9px;margin-right:8px;}
+    .nav-logo-icon{width:32px;height:32px;background:var(--ink);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+    .nav-logo-icon svg{width:14px;height:14px;}
+    .badge-new{background:#0057FF;color:white;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-right:auto;}
+    .nav-links{display:flex;gap:4px;margin-left:auto;}
+    .nav-link{font-size:13px;color:var(--ink3);text-decoration:none;padding:6px 12px;border-radius:7px;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+    .nav-link:hover{background:var(--border);color:var(--ink);}
+    .nav-link.active{background:var(--ink);color:white;}
+    /* unified footer */
+    footer{border-top:1px solid var(--border);padding:32px 44px;background:var(--card);margin-top:auto;}
+    .footer-inner{max-width:1100px;margin:0 auto;}
+    .footer-top{display:flex;gap:48px;margin-bottom:24px;}
+    .footer-brand{flex:1.5;}
+    .footer-brand h4{font-family:'Fustat',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px;}
+    .footer-brand p{font-size:12px;color:var(--ink4);line-height:1.5;max-width:260px;}
+    .footer-col{flex:1;}
+    .footer-col h5{font-size:10px;font-weight:700;letter-spacing:0.5px;color:var(--ink3);margin-bottom:10px;}
+    .footer-col a{display:block;font-size:12px;color:var(--ink4);text-decoration:none;margin-bottom:4px;}
+    .footer-col a:hover{color:var(--ink);}
+    .footer-col p{font-size:12px;color:var(--ink4);margin-bottom:4px;}
+    .footer-note{font-size:11px;color:var(--ink4);font-style:italic;margin-top:8px;}
+    .footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border);}
+    .footer-bottom p{font-size:11px;color:var(--ink4);}
+    .footer-bottom a{font-size:11px;color:var(--ink4);text-decoration:none;}
+    @media(max-width:768px){
+      nav{padding:0 20px;flex-wrap:wrap;height:auto;padding-top:12px;}
+      .nav-links{gap:2px;flex-wrap:wrap;justify-content:center;padding:8px 0;}
+      .nav-link{font-size:12px;padding:5px 8px;}
+      .footer-top{flex-direction:column;gap:24px;}
+      .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+      footer{padding:24px 20px;}
     }
   </style>
 </head>
@@ -309,15 +340,18 @@
 <!-- NAV -->
 <header>
   <nav>
-    <a href="index.html" class="nav-logo">
-      <div class="logo-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M5 13V7h6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7v6h-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <a class="nav-logo" href="index.html">
+      <div class="nav-logo-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M5 13V7h6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7v6h-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       Audit Recipe
     </a>
-<div class="nav-links">    <a href="finding-builder.html" class="nav-link active">Finding Builder</a>
-    <a href="report-builder.html" class="nav-link">Report Builder</a>
-    <a href="compliance-analyzer.html" class="nav-link">Compliance Analyzer</a>
-    <a href="standards-ai.html" class="nav-link">StandardsAI</a>
-    <a href="compliance-advisory.html" class="nav-link">Compliance Advisory</a>
+    <span class="badge-new">NEW</span>
+    <div class="nav-links">
+    <a class="nav-link active" href="finding-builder.html">Finding Builder</a>
+    <a class="nav-link" href="report-builder.html">Report Builder</a>
+    <a class="nav-link" href="compliance-analyzer.html">Compliance Analyzer</a>
+    <a class="nav-link" href="standards-ai.html">StandardsAI</a>
+    <a class="nav-link" href="compliance-advisory.html">Compliance Advisory</a>
+    </div>
   </nav>
 </header>
 
@@ -550,7 +584,39 @@
 <div id="print-area"></div>
 
 <footer>
-  <p>© 2026 Audit Recipe. All rights reserved.</p>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Audit Recipe</h4>
+        <p>AI-powered tools designed for internal auditors and compliance officers. Built to assist, not replace, professional judgment.</p>
+      </div>
+      <div class="footer-col">
+        <h5>TOOLS</h5>
+        <a href="finding-builder.html">Finding Builder</a>
+        <a href="report-builder.html">Report Builder</a>
+        <a href="compliance-analyzer.html">Compliance Analyzer</a>
+        <a href="standards-ai.html">StandardsAI</a>
+        <a href="compliance-advisory.html">Compliance Advisory</a>
+      </div>
+      <div class="footer-col">
+        <h5>PRIVACY COMMITMENT</h5>
+        <p>Zero data storage</p>
+        <p>No logs retained</p>
+        <p>No results stored</p>
+        <p>Session only processing</p>
+      </div>
+      <div class="footer-col">
+        <h5>LEGAL</h5>
+        <a href="terms.html">Terms &amp; Conditions</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <p class="footer-note">For professional use by auditors and compliance officers only.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Audit Recipe. All rights reserved.</p>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </div>
+  </div>
 </footer>
 
 <script>
@@ -818,7 +884,7 @@
   .risk-item { margin-bottom: 6pt; }
   .action-item { margin-bottom: 8pt; padding: 8pt; border: 1px solid #ddd; }
   .action-owner { font-size: 9pt; color: #0E7490; font-weight: bold; text-transform: uppercase; margin-bottom: 3pt; }
-  .footer-note { margin-top: 30pt; font-size: 9pt; color: #C0C0C0; border-top: 1px solid #eee; padding-top: 8pt; }
+  
 </style></head><body>
 <h1>Audit Observation: ${escHtml(r.title)}</h1>
 <h2>Summary</h2><p>${escHtml(r.summary)}</p>

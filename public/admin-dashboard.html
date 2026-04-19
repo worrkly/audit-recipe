@@ -92,7 +92,7 @@
   <div class="nav-links">
     <a class="nav-link" href="index.html">← Home</a>
     <a class="nav-link" href="compliance-advisory.html">Compliance Advisory</a>
-    <a class="nav-link" href="standards-ai.html">StandardsAI</a>
+    <a class="nav-link" href="standards-ai.html">Compliance Audit</a>
   </div>
   <button class="btn-logout" onclick="logout()">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout
@@ -123,7 +123,7 @@
           <option value="">All Tools</option>
           <option value="finding_builder">Finding Builder</option>
           <option value="report_builder">Report Builder</option>
-          <option value="standards_ai">StandardsAI</option>
+          <option value="standards_ai">Compliance Audit</option>
           <option value="compliance_advisory">Compliance Advisory</option>
           <option value="compliance_analyzer">Compliance Analyzer</option>
         </select>
@@ -189,7 +189,7 @@ async function loadStats(){
     document.getElementById('statPopular').textContent=fmtTool(stats.mostPopularTool||'—');
     const bd=stats.toolBreakdown||{};
     const tot=Object.values(bd).reduce((a,b)=>a+b,0)||1;
-    const tnames={finding_builder:'Finding Builder',report_builder:'Report Builder',standards_ai:'StandardsAI',compliance_advisory:'Compliance Advisory',compliance_analyzer:'Compliance Analyzer'};
+    const tnames={finding_builder:'Finding Builder',report_builder:'Report Builder',standards_ai:'Compliance Audit',compliance_advisory:'Compliance Advisory',compliance_analyzer:'Compliance Analyzer'};
     document.getElementById('toolBreakdown').innerHTML=Object.entries(bd).length
       ?Object.entries(bd).sort((a,b)=>b[1]-a[1]).map(([t,c])=>`<div class="tool-row"><span class="tool-name">${tnames[t]||t}</span><div class="tool-bar-wrap"><div class="tool-bar" style="width:${Math.round(c/tot*100)}%"></div></div><span class="tool-count">${c}</span></div>`).join('')
       :'<div style="color:var(--ink3);font-size:13px">No activity yet</div>';
@@ -214,7 +214,7 @@ function renderActivityTable(entries,id){
     return `<tr><td style="font-size:12px;white-space:nowrap">${ts}</td><td><span class="tool-tag ${e.tool}">${fmtTool(e.tool)}</span></td><td style="font-size:12px;color:var(--ink3)">${e.action}</td><td><span class="ip-text">${e.ip}</span></td><td><span class="meta-text">${ms||'—'}</span></td></tr>`;
   }).join('');
 }
-function fmtTool(t){return {finding_builder:'Finding Builder',report_builder:'Report Builder',standards_ai:'StandardsAI',compliance_advisory:'Compliance Advisory',compliance_analyzer:'Compliance Analyzer'}[t]||t;}
+function fmtTool(t){return {finding_builder:'Finding Builder',report_builder:'Report Builder',standards_ai:'Compliance Audit',compliance_advisory:'Compliance Advisory',compliance_analyzer:'Compliance Analyzer'}[t]||t;}
 async function loadRegulations(){
   try{
     const r=await fetch('/api/regulations');
@@ -283,6 +283,7 @@ async function submitUpload(){
   try{
     const r=await fetch('/api/regulations',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':ADMIN_KEY},
       body:JSON.stringify({title,issuer,version,category,text:pendingText,filename:pendingFile?.name})});
+      if(!r.ok){const et=await r.text();throw new Error(et||"Upload failed: "+r.status);}
     const d=await r.json();
     document.getElementById('progressFill').style.width='100%';
     if(d.success){showToast('"'+title+'" uploaded — '+d.chunkCount+' chunks indexed','success');cancelUpload();loadRegulations();loadStats();}

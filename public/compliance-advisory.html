@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initialh-scale=1.0"/>
-  <title>Compliance Advisory — Audit Recipe</title>
+  <title>Compliance Advisory â Audit Recipe</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fustat:wght@700;800&display=swap" rel="stylesheet"/>
   <style>
     :root{--bg:#F9F9F8;--card:#FFFFFF;--ink:#0C0C0C;--ink2:#3A3A3A;--ink3:#7A7A7A;--ink4:#C0C0C0;--border:rgba(0,0,0,0.07);--borderMd:rgba(0,0,0,0.11);--blue:#0057FF;--red:#D94040;--green:#1A9E5C;--amber:#D97706;--purple:#7C3AED;--r:10px;}
@@ -41,7 +41,6 @@
     .reg-name{font-size:12px;color:var(--ink2);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .reg-meta{font-size:10px;color:var(--ink4);margin-top:1px;}
     .reg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-    .select-all-btn{width:100%;padding:10px 16px;border:none;background:none;font-size:12px;color:var(--blue);cursor:pointer;font-family:inherit;text-align:left;border-top:1px solid var(--border);}
     .empty-regs{padding:24px 16px;text-align:center;color:var(--ink3);font-size:12px;}
     .main-content{flex:1;min-width:0;}
     .page-header{margin-bottom:28px;}
@@ -128,40 +127,47 @@
     .tc-highlight p{font-size:13px;color:#065F46;font-weight:500;}
     .tc-close{width:100%;padding:12px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:24px;}
   
-    /* unified nav */
-    nav{max-width:1100px;margin:0 auto;padding:0 44px;display:flex;align-items:center;height:58px;}
-    .nav-logo{font-family:'Fustat',sans-serif;font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-0.5px;text-decoration:none;display:flex;align-items:center;gap:9px;margin-right:8px;}
-    .nav-logo-icon{width:32px;height:32px;background:var(--ink);border-radius:8px;display:flex;align-items:center;justify-content:center;}
-    .nav-logo-icon svg{width:14px;height:14px;}
-    .badge-new{background:#0057FF;color:white;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-right:auto;}
-    .nav-links{display:flex;gap:4px;margin-left:auto;}
-    .nav-link{font-size:13px;color:var(--ink3);text-decoration:none;padding:6px 12px;border-radius:7px;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
-    .nav-link:hover{background:var(--border);color:var(--ink);}
-    .nav-link.active{background:var(--ink);color:white;}
-    /* unified footer */
-    footer{border-top:1px solid var(--border);padding:32px 44px;background:var(--card);margin-top:auto;}
-    .footer-inner{max-width:1100px;margin:0 auto;}
-    .footer-top{display:flex;gap:48px;margin-bottom:24px;}
-    .footer-brand{flex:1.5;}
-    .footer-brand h4{font-family:'Fustat',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px;}
-    .footer-brand p{font-size:12px;color:var(--ink4);line-height:1.5;max-width:260px;}
-    .footer-col{flex:1;}
-    .footer-col h5{font-size:10px;font-weight:700;letter-spacing:0.5px;color:var(--ink3);margin-bottom:10px;}
-    .footer-col a{display:block;font-size:12px;color:var(--ink4);text-decoration:none;margin-bottom:4px;}
-    .footer-col a:hover{color:var(--ink);}
-    .footer-col p{font-size:12px;color:var(--ink4);margin-bottom:4px;}
-    .footer-note{font-size:11px;color:var(--ink4);font-style:italic;margin-top:8px;}
-    .footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border);}
-    .footer-bottom p{font-size:11px;color:var(--ink4);}
-    .footer-bottom a{font-size:11px;color:var(--ink4);text-decoration:none;}
-    @media(max-width:768px){
-      nav{padding:0 20px;flex-wrap:wrap;height:auto;padding-top:12px;}
-      .nav-links{gap:2px;flex-wrap:wrap;justify-content:center;padding:8px 0;}
-      .nav-link{font-size:12px;padding:5px 8px;}
-      .footer-top{flex-direction:column;gap:24px;}
-      .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
-      footer{padding:24px 20px;}
+    /* ââ Unified Nav ââ */
+    nav { max-width:1100px; margin:0 auto; padding:0 44px; display:flex; align-items:center; height:58px; }
+    .nav-logo {
+      font-family:'Fustat',sans-serif; font-weight:800; font-size:16px;
+      color:var(--ink); letter-spacing:-0.5px; text-decoration:none;
+      display:flex; align-items:center; gap:9px; margin-right:8px;
     }
+    .nav-logo-icon { width:32px; height:32px; background:var(--ink); border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .nav-logo-icon svg { width:14px; height:14px; }
+    .badge-new { background:#0057FF; color:white; font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; margin-right:auto; }
+    .nav-links { display:flex; gap:4px; margin-left:auto; }
+    .nav-link { font-size:13px; color:var(--ink3); text-decoration:none; padding:6px 12px; border-radius:7px; transition:all 0.15s; font-family:'DM Sans',sans-serif; }
+    .nav-link:hover { background:var(--border); color:var(--ink); }
+    .nav-link.active { background:var(--ink); color:white; }
+
+    /* ââ Unified Footer ââ */
+    footer { border-top:1px solid var(--border); padding:32px 44px; background:var(--card); margin-top:auto; }
+    .footer-inner { max-width:1100px; margin:0 auto; }
+    .footer-top { display:flex; gap:48px; margin-bottom:24px; }
+    .footer-brand { flex:1.5; }
+    .footer-brand h4 { font-family:'Fustat',sans-serif; font-size:15px; font-weight:800; color:var(--ink); margin-bottom:6px; }
+    .footer-brand p { font-size:12px; color:var(--ink4); line-height:1.5; max-width:260px; }
+    .footer-col { flex:1; }
+    .footer-col h5 { font-size:10px; font-weight:700; letter-spacing:0.5px; color:var(--ink3); margin-bottom:10px; }
+    .footer-col a { display:block; font-size:12px; color:var(--ink4); text-decoration:none; margin-bottom:4px; }
+    .footer-col a:hover { color:var(--ink); }
+    .footer-col p { font-size:12px; color:var(--ink4); margin-bottom:4px; }
+    .footer-note { font-size:11px; color:var(--ink4); font-style:italic; margin-top:8px; }
+    .footer-bottom { display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border); }
+    .footer-bottom p { font-size:11px; color:var(--ink4); }
+    .footer-bottom a { font-size:11px; color:var(--ink4); text-decoration:none; }
+
+    @media (max-width:768px) {
+      nav { padding:0 20px; flex-wrap:wrap; height:auto; padding-top:12px; }
+      .nav-links { gap:2px; flex-wrap:wrap; justify-content:center; padding:8px 0; }
+      .nav-link { font-size:12px; padding:5px 8px; }
+      .footer-top { flex-direction:column; gap:24px; }
+      .footer-bottom { flex-direction:column; gap:8px; text-align:center; }
+      footer { padding:24px 20px; }
+    }
+
   </style>
 </head>
 <body>
@@ -184,10 +190,9 @@
 <div class="app-layout">
   <aside class="sidebar">
     <div class="sidebar-card">
-      <div class="sidebar-card-header"><h3>Regulation Database</h3><p>Select which regulations to search</p></div>
+      <div class="sidebar-card-header"><h3>Regulation Database</h3><p>All uploaded regulations are searched automatically</p></div>
       <div class="db-status"><div class="db-dot" id="dbDot"></div><span class="db-count" id="dbCount">Loading...</span></div>
       <div class="reg-list" id="regList"><div class="empty-regs">No regulations uploaded yet.<br>Contact your administrator.</div></div>
-      <button class="select-all-btn" onclick="toggleSelectAll()">Select / Deselect All</button>
     </div>
     <div class="sidebar-card">
       <div class="sidebar-card-header"><h3>Categories</h3></div>
@@ -200,7 +205,7 @@
       <div class="search-box">
         <textarea id="questionInput" placeholder="Ask a compliance question in English or Arabic...&#10;&#10;Example: What are SAMA's board independence requirements?" rows="3" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
         <div class="search-footer">
-          <span class="search-hint">Press <span>Ctrl+Enter</span> to submit · Responds in the language you write in</span>
+          <span class="search-hint">Press <span>Ctrl+Enter</span> to submit Â· Responds in the language you write in</span>
           <button class="btn-search" id="searchBtn" onclick="submitQuestion()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             Get Advisory
@@ -215,7 +220,7 @@
           <button class="quick-chip" onclick="fillQuestion(this.textContent)">What must be disclosed in Pillar 3 for remuneration?</button>
           <button class="quick-chip" onclick="fillQuestion(this.textContent)">What are the AML customer due diligence requirements?</button>
           <button class="quick-chip" onclick="fillQuestion(this.textContent)">What are the variable pay deferral requirements for MRTs?</button>
-          <button class="quick-chip" onclick="fillQuestion(this.textContent)">ما هي متطلبات حوكمة مجلس الإدارة وفقاً لنظام ساما؟</button>
+          <button class="quick-chip" onclick="fillQuestion(this.textContent)">ÙØ§ ÙÙ ÙØªØ·ÙØ¨Ø§Øª Ø­ÙÙÙØ© ÙØ¬ÙØ³ Ø§ÙØ¥Ø¯Ø§Ø±Ø© ÙÙÙØ§Ù ÙÙØ¸Ø§Ù Ø³Ø§ÙØ§Ø</button>
         </div>
       </div>
     </div>
@@ -266,15 +271,15 @@
   <div class="tc-modal">
     <h2>Terms &amp; Conditions</h2><p class="tc-date">Effective Date: January 2026</p>
     <div class="tc-section"><h3>1. Purpose &amp; Intended Users</h3><p>Audit Recipe is a professional tool designed exclusively to assist internal auditors, compliance officers, and regulatory professionals in their work. It is not intended for general public use or as a substitute for qualified legal or regulatory advice.</p></div>
-    <div class="tc-section"><h3>2. Data Privacy — No Storage Policy</h3><div class="tc-highlight"><p>🔒 Audit Recipe does not store, retain, log, or transmit any user-submitted data, queries, documents, or results. All processing occurs within your session only and is discarded immediately upon completion. No database of user activity is maintained. No query history is recorded. Your work is your own.</p></div><p>Uploaded documents and questions are processed in real-time solely to generate your requested output. They are never written to any persistent storage, never shared with third parties, and never used to train or improve any AI model.</p></div>
+    <div class="tc-section"><h3>2. Data Privacy â No Storage Policy</h3><div class="tc-highlight"><p>ð Audit Recipe does not store, retain, log, or transmit any user-submitted data, queries, documents, or results. All processing occurs within your session only and is discarded immediately upon completion. No database of user activity is maintained. No query history is recorded. Your work is your own.</p></div><p>Uploaded documents and questions are processed in real-time solely to generate your requested output. They are never written to any persistent storage, never shared with third parties, and never used to train or improve any AI model.</p></div>
     <div class="tc-section"><h3>3. Advisory Nature of Outputs</h3><p>All outputs generated by Audit Recipe are for informational and professional assistance purposes only. They do not constitute legal advice, regulatory rulings, or binding determinations. Always consult qualified legal counsel for binding interpretation of any regulation or standard.</p></div>
     <div class="tc-section"><h3>4. Professional Responsibility</h3><p>Users are responsible for verifying all outputs against primary regulatory sources. Audit Recipe assists in identifying potential compliance issues but does not replace the professional judgment of a qualified auditor or compliance officer.</p></div>
     <div class="tc-section"><h3>5. Regulation Database</h3><p>The regulation database is maintained by your organization's administrator. The accuracy of advisory responses depends on the regulations uploaded to the system.</p></div>
     <div class="tc-section"><h3>6. Limitation of Liability</h3><p>Audit Recipe and its operators accept no liability for decisions made on the basis of outputs generated by this tool. Users assume full responsibility for any actions taken in reliance on tool outputs.</p></div>
-    <button class="tc-close" onclick="closeTC()">I Understand — Close</button>
+    <button class="tc-close" onclick="closeTC()">I Understand â Close</button>
   </div>
 </div><script>
-let regulations=[],selectedRegIds=new Set(),allSelected=true;
+let regulations=[];
 loadRegulations();
 async function loadRegulations(){
   try{
@@ -286,10 +291,10 @@ async function loadRegulations(){
     document.getElementById('dbCount').textContent='Demo mode';
     document.getElementById('dbDot').style.background='var(--amber)';
     regulations=[{id:'d1',title:'SAMA Corporate Governance Framework',issuer:'SAMA',version:'2021',category:'governance'},
-      {id:'d2',title:'Basel III — Pillar 3',issuer:'BCBS',version:'2023',category:'capital'},
+      {id:'d2',title:'Basel III â Pillar 3',issuer:'BCBS',version:'2023',category:'capital'},
       {id:'d3',title:'SAMA AML/CTF Rules',issuer:'SAMA',version:'2023',category:'aml'},
       {id:'d4',title:'SAMA Remuneration Principles',issuer:'SAMA',version:'2022',category:'remuneration'},
-      {id:'d5',title:'IFRS 9 — Financial Instruments',issuer:'IASB',version:'2018',category:'reporting'},
+      {id:'d5',title:'IFRS 9 â Financial Instruments',issuer:'IASB',version:'2018',category:'reporting'},
       {id:'d6',title:'SAMA Cybersecurity Framework',issuer:'SAMA',version:'2023',category:'cyber'}];
     renderRegulations();renderCategories();
   }
@@ -299,9 +304,8 @@ function renderRegulations(){
   const count=document.getElementById('dbCount');
   if(!regulations.length){list.innerHTML='<div class="empty-regs">No regulations uploaded yet.<br>Contact your administrator.</div>';count.textContent='0 regulations';document.getElementById('dbDot').style.background='var(--ink4)';return;}
   count.textContent=regulations.length+' regulation'+(regulations.length!==1?'s':'')+' loaded';
-  selectedRegIds=new Set(regulations.map(r=>r.id));
   const cc={governance:'#0057FF',capital:'#D97706',aml:'#D94040',remuneration:'#7C3AED',reporting:'#1A9E5C',cyber:'#0891B2',general:'#6B7280'};
-  list.innerHTML=regulations.map(r=>`<div class="reg-item selected" id="ri_${r.id}" onclick="toggleReg('${r.id}')"><div class="reg-dot" style="background:${cc[r.category]||'#6B7280'}"></div><div class="reg-info"><div class="reg-name">${r.title}</div><div class="reg-meta">${r.issuer} · ${r.version}</div></div><div class="reg-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></div>`).join('');
+  list.innerHTML=regulations.map(r=>`<div class="reg-item" style="cursor:default"><div class="reg-dot" style="background:${cc[r.category]||'#6B7280'}"></div><div class="reg-info"><div class="reg-name">${r.title}</div><div class="reg-meta">${r.issuer} Â· ${r.version}</div></div></div>`).join('');
 }
 function renderCategories(){
   const cats={};
@@ -310,22 +314,13 @@ function renderCategories(){
   const ct={governance:'#0057FF',capital:'#D97706',aml:'#D94040',remuneration:'#7C3AED',reporting:'#1A9E5C',cyber:'#0891B2',general:'#6B7280'};
   document.getElementById('categoryList').innerHTML=Object.entries(cats).map(([c,n])=>`<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${cb[c]||'#F3F4F6'};color:${ct[c]||'#6B7280'}">${c} (${n})</span>`).join('');
 }
-function toggleReg(id){
-  const el=document.getElementById('ri_'+id);
-  if(selectedRegIds.has(id)){selectedRegIds.delete(id);el.classList.remove('selected');}else{selectedRegIds.add(id);el.classList.add('selected');}
-}
-function toggleSelectAll(){
-  if(selectedRegIds.size===regulations.length){selectedRegIds.clear();document.querySelectorAll('.reg-item').forEach(e=>e.classList.remove('selected'));}
-  else{regulations.forEach(r=>selectedRegIds.add(r.id));document.querySelectorAll('.reg-item').forEach(e=>e.classList.add('selected'));}
-}
 function fillQuestion(text){const ta=document.getElementById('questionInput');ta.value=text;autoResize(ta);}
 function handleKey(e){if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();submitQuestion();}}
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,160)+'px';}
 async function submitQuestion(){
   const q=document.getElementById('questionInput').value.trim();
   if(!q)return;
-  if(selectedRegIds.size===0){alert('Please select at least one regulation.');return;}
-  trackUsage('compliance_advisory','question_asked',{questionLength:q.length,regulationCount:selectedRegIds.size});
+  trackUsage('compliance_advisory','question_asked',{questionLength:q.length,regulationCount:regulations.length});
   document.getElementById('searchState').style.display='none';
   document.getElementById('loadingState').classList.add('show');
   document.getElementById('resultSection').classList.remove('show');
@@ -333,25 +328,25 @@ async function submitQuestion(){
   const labels=['Searching regulation database...','Analyzing relevant clauses...','Generating structured advisory...'];
   let li=0;const iv=setInterval(()=>{document.getElementById('loadingLabel').textContent=labels[li++%labels.length];},1200);
   try{
-    const r=await fetch('/api/advisory',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,regulationIds:Array.from(selectedRegIds)})});
+    const r=await fetch('/api/advisory',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
     const data=await r.json();clearInterval(iv);renderResult(q,data);
     trackUsage('compliance_advisory','result_shown',{citationCount:data.citations?.length||0,confidence:data.confidence||0});
   }catch(e){clearInterval(iv);renderError(q);}
   document.getElementById('loadingState').classList.remove('show');
   document.getElementById('searchBtn').disabled=false;
 }function renderResult(q,data){
-  document.getElementById('resultQuestion').textContent='❝ '+q+' ❞';
+  document.getElementById('resultQuestion').textContent='â '+q+' â';
   const rc=data.riskFlag||'none';
-  const rl={critical:'🔴 Critical Risk',high:'🟠 High Risk',medium:'🟡 Medium Risk',low:'🟢 Low Risk',none:'No Risk Flag'};
+  const rl={critical:'ð´ Critical Risk',high:'ð  High Risk',medium:'ð¡ Medium Risk',low:'ð¢ Low Risk',none:'No Risk Flag'};
   const cp=Math.min(100,Math.max(0,data.confidence||0));
   const ans=(data.answer||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  const cites=(data.citations||[]).map(c=>`<div class="citation-card"><div class="citation-header"><div class="citation-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div class="citation-reg">${c.regulation}</div><div class="citation-meta">${c.issuer} · ${c.version}</div></div><span class="citation-clause">${c.clause}</span></div><div class="citation-body"><p class="citation-excerpt">"${c.excerpt}"</p></div></div>`).join('');
+  const cites=(data.citations||[]).map(c=>`<div class="citation-card"><div class="citation-header"><div class="citation-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div class="citation-reg">${c.regulation}</div><div class="citation-meta">${c.issuer} Â· ${c.version}</div></div><span class="citation-clause">${c.clause}</span></div><div class="citation-body"><p class="citation-excerpt">"${c.excerpt}"</p></div></div>`).join('');
   const rel=(data.relatedClauses||[]).length?`<div class="related-section"><div class="related-title">Related Clauses</div><div class="related-tags">${data.relatedClauses.map(c=>`<span class="related-tag">${c}</span>`).join('')}</div></div>`:'';
   document.getElementById('resultCard').innerHTML=`<div class="result-card"><div class="result-card-header"><span class="result-card-title">Advisory Response</span><div class="result-card-badges"><div class="confidence-pill"><span class="confidence-label">Confidence</span><div class="confidence-track"><div class="confidence-fill" style="width:${cp}%"></div></div><span class="confidence-pct">${cp}%</span></div><span class="risk-badge ${rc}">${rl[rc]||rc}</span></div></div><div class="result-answer">${ans}</div>${cites?`<div class="citations-section"><div class="citations-title">Sources &amp; Citations (${(data.citations||[]).length})</div>${cites}</div>`:''}${rel}</div>`;
   document.getElementById('resultSection').classList.add('show');
 }
 function renderError(q){
-  document.getElementById('resultQuestion').textContent='❝ '+q+' ❞';
+  document.getElementById('resultQuestion').textContent='â '+q+' â';
   document.getElementById('resultCard').innerHTML='<div class="no-results"><p>Could not generate a response. Please check your connection and try again.</p></div>';
   document.getElementById('resultSection').classList.add('show');
 }
@@ -367,3 +362,4 @@ async function trackUsage(tool,action,metadata){
 function openTC(){document.getElementById('tcOverlay').classList.add('show');}
 function closeTC(){document.getElementById('tcOverlay').classList.remove('show');}
 </script></body></html>
+

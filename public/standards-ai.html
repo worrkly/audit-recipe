@@ -45,8 +45,8 @@
     .tab-btn{padding:6px 12px;border-radius:7px;border:1px solid var(--border);font-size:12px;color:var(--ink3);cursor:pointer;background:transparent;font-family:inherit;}
     .tab-btn.active{background:var(--ink);color:white;border-color:var(--ink);}
     .controls-row{display:flex;align-items:center;gap:12px;margin-bottom:32px;flex-wrap:wrap;}
-    .mode-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--borderMd);font-size:13px;color:var(--ink3);cursor:pointer;background:var(--card);font-family:inherit;}
-    .mode-btn.active{background:var(--ink);color:white;border-color:var(--ink);}
+    
+    
     .btn-primary{padding:10px 24px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;margin-left:auto;}
     .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
     .progress-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:32px;text-align:center;margin-bottom:32px;display:none;}
@@ -68,10 +68,11 @@
     .filter-btn.partial.active{background:var(--amber);color:white;}
     .filter-btn.compliant.active{background:var(--green);color:white;}
     .btn-export{margin-left:auto;padding:7px 16px;border-radius:8px;border:1px solid var(--borderMd);font-size:12px;cursor:pointer;background:var(--card);font-family:inherit;display:flex;align-items:center;gap:6px;}
-    .findings-table{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+    .findings-table{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;width:100%;table-layout:fixed;border-collapse:collapse;}
+      .table-wrap{overflow-x:auto;max-width:100%;margin:24px 0;}
     .findings-table table{width:100%;border-collapse:collapse;font-size:13px;}
     .findings-table th{padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);background:#FAFAFA;}
-    .findings-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top;}
+    .findings-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top;word-break:break-word;overflow-wrap:break-word;}
     .findings-table tr:last-child td{border-bottom:none;}
     .findings-table tr:hover td{background:#FAFAFA;cursor:pointer;}
     .status-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
@@ -183,12 +184,7 @@
       <div id="doc-paste-panel" style="display:none"><textarea class="paste-area" id="docPaste" placeholder="Paste document text here..."></textarea></div>
     </div>
   </div>
-  <div class="controls-row">
-    <span style="font-size:13px;font-weight:600">Audit Mode:</span>
-    <button class="mode-btn active" data-mode="full" onclick="selectMode(this)">Full Compliance Audit</button>
-    <button class="mode-btn" data-mode="gap" onclick="selectMode(this)">Gap Analysis</button>
-    <button class="mode-btn" data-mode="disclosure" onclick="selectMode(this)">Disclosure Check</button>
-    <button class="btn-primary" id="runBtn" onclick="runAudit()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run Audit</button>
+  </svg>Run Audit</button>
   </div>
   <div class="progress-panel" id="progressPanel">
     <p style="font-weight:600;font-size:15px" id="progressLabel">Analyzing...</p>

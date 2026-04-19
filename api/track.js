@@ -1,5 +1,6 @@
-// api/track.js
-const activityLog = [];
+// api/track.js — activity log with Vercel KV persistence
+import { kv } from '@vercel/kv';
+const KV_KEY = 'activity_log';
 const MAX = 10000;
 
 export default async function handler(req, res) {
@@ -17,23 +18,30 @@ export default async function handler(req, res) {
       tool, action, ip:anonIp(ip), timestamp:new Date().toISOString(),
       metadata:sanitize(tool,metadata)
     };
-    activityLog.unshift(entry);
-    if(activityLog.length>MAX) activityLog.pop();
+    try {
+      const log = (await kv.get(KV_KEY)) || [];
+      log.unshift(entry);
+      if(log.length>MAX) log.length=MAX;
+      await kv.set(KV_KEY, log);
+    } catch(e) { console.error('KV write error:',e); }
     return res.status(200).json({success:true});
   }
 
   if(req.method==='GET') {
     if(req.headers['x-admin-key']!==process.env.ADMIN_SECRET) return res.status(401).json({error:'Unauthorized'});
     const {tool,limit=500,offset=0} = req.query;
-    let filtered = tool ? activityLog.filter(e=>e.tool===tool) : activityLog;
-    return res.status(200).json({total:filtered.length,entries:filtered.slice(+offset,+offset+ +limit),stats:computeStats(activityLog)});
+    let log = [];
+    try { log = (await kv.get(KV_KEY)) || []; } catch(e) { console.error('KV read error:',e); }
+    let filtered = tool ? log.filter(e=>e.tool===tool) : log;
+    return res.status(200).json({total:filtered.length,entries:filtered.slice(+offset,+offset+ +limit),stats:computeStats(log)});
   }
+
   return res.status(405).json({error:'Method not allowed'});
 }
 
 function anonIp(ip) {
-  if(ip.includes('.')) { const p=ip.split('.'); return p[0]+'.'+p[1]+'.'+p[2]+'.***'; }
-  return ip.substring(0,8)+'***';
+  if(ip.includes('.')) { const p=ip.split('.'); return p[0]+'.'+p[1]+'.'+p[2]+'.*'; }
+  return ip.substring(0,8)+'****';
 }
 
 function sanitize(tool,meta) {
@@ -61,6 +69,6 @@ function computeStats(log) {
   const top=Object.entries(toolCounts).sort((a,b)=>b[1]-a[1])[0];
   const peak=Object.entries(hourCounts).sort((a,b)=>b[1]-a[1])[0];
   return {totalUsage:log.length,toolBreakdown:toolCounts,mostPopularTool:top?.[0]||'none',
-    last7Days:Object.entries(dailyCounts).sort((a,b)=>a[0].localeCompare(b[0])).slice(-7),
-    peakHour:peak?`${peak[0]}:00`:'unknown'};
+    last7Days:Object.entries(dailyCounts).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,7),
+    peakHour:peak?.[0]||0};
 }

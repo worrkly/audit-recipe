@@ -70,7 +70,7 @@ footer a{font-size:12px;color:var(--blue);text-decoration:underline;cursor:point
   </div>
 </main>
 <footer>
-  <p>© 2026 Audit Recipe. All rights reserved. &nbsp;·&nbsp; <a onclick="openTC()">Terms &amp; Conditions</a></p>
+  <p>© 2026 Audit Recipe. All rights reserved.  ·  <a onclick="openTC()">Terms &amp; Conditions</a></p>
 </footer>
 <div class="tc-overlay" id="tcOverlay" onclick="if(event.target===this)closeTC()">
   <div class="tc-modal">
@@ -83,9 +83,8 @@ footer a{font-size:12px;color:var(--blue);text-decoration:underline;cursor:point
   </div>
 </div>
 <script>
-if(sessionStorage.getItem('fr_admin')==='true'){window.location.href='admin-dashboard.html';}
-const ADMIN_USER='admin',ADMIN_PASS='findingrecipe2026';
-function login(){
+if(sessionStorage.getItem('adminToken')){window.location.href='admin-dashboard.html';}
+async function login(){
   const user=document.getElementById('username').value.trim();
   const pass=document.getElementById('password').value;
   const err=document.getElementById('error-box');
@@ -95,12 +94,21 @@ function login(){
   if(!user&&!pass){err.textContent='Please enter your username and password.';err.style.display='block';uInp.classList.add('err');pInp.classList.add('err');uInp.focus();return;}
   if(!user){err.textContent='Please enter your username.';err.style.display='block';uInp.classList.add('err');uInp.focus();return;}
   if(!pass){err.textContent='Please enter your password.';err.style.display='block';pInp.classList.add('err');pInp.focus();return;}
-  if(user===ADMIN_USER&&pass===ADMIN_PASS){
-    sessionStorage.setItem('fr_admin','true');
-    const btn=document.getElementById('login-btn');btn.textContent='Logging in...';btn.style.opacity='0.7';
-    setTimeout(()=>{window.location.href='admin-dashboard.html';},400);
-  }else{
-    err.textContent='Incorrect username or password. Please try again.';err.style.display='block';uInp.classList.add('err');pInp.classList.add('err');pInp.value='';pInp.focus();
+  const btn=document.getElementById('login-btn');btn.textContent='Verifying...';btn.style.opacity='0.7';btn.disabled=true;
+  try{
+    const r=await fetch('/api/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,password:pass})});
+    const data=await r.json();
+    if(data.success&&data.token){
+      sessionStorage.setItem('adminToken',data.token);
+      btn.textContent='Logging in...';
+      setTimeout(()=>{window.location.href='admin-dashboard.html';},300);
+    }else{
+      err.textContent=data.error||'Incorrect username or password.';err.style.display='block';uInp.classList.add('err');pInp.classList.add('err');pInp.value='';pInp.focus();
+      btn.textContent='Access admin panel';btn.style.opacity='1';btn.disabled=false;
+    }
+  }catch(e){
+    err.textContent='Connection error. Please try again.';err.style.display='block';
+    btn.textContent='Access admin panel';btn.style.opacity='1';btn.disabled=false;
   }
 }
 function openTC(){document.getElementById('tcOverlay').classList.add('show');}

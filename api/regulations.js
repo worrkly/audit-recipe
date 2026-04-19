@@ -1,8 +1,9 @@
 // api/regulations.js
 // Persistent regulation storage via Vercel KV (Redis)
 // Falls back to in-memory Map if KV env vars not configured
+import { verifyAdminToken } from './admin-verify.js';
 
-/* âââ Storage layer âââââââââââââââââââââââââââââââââââââââ */
+/* --- Storage layer --------------------------------------- */
 const KV_URL = process.env.KV_REST_API_URL;
 const KV_TOKEN = process.env.KV_REST_API_TOKEN;
 const KV_AVAILABLE = !!(KV_URL && KV_TOKEN);
@@ -38,11 +39,11 @@ async function storeDel(key) {
   await kvFetch(`/del/${encodeURIComponent(key)}`, { method: 'POST' });
 }
 
-/* âââ Keys ââââââââââââââââââââââââââââââââââââââââââââââââ */
+/* --- Keys ------------------------------------------------ */
 const INDEX_KEY = 'audit_regs:index';
 const dataKey = (id) => `audit_regs:${id}`;
 
-/* âââ API handler âââââââââââââââââââââââââââââââââââââââââ */
+/* --- API handler ----------------------------------------- */
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
@@ -52,17 +53,17 @@ export default async function handler(req, res) {
   const adminKey = req.headers['x-admin-key'];
   const ADMIN_SECRET = process.env.ADMIN_SECRET || 'findingrecipe2026';
 
-  if (req.method !== 'GET' && adminKey !== ADMIN_SECRET) {
+  if (req.method !== 'GET' && adminKey !== ADMIN_SECRET && !verifyAdminToken(adminKey)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  /* ââ GET: list regulations ââ */
+  /* -- GET: list regulations -- */
   if (req.method === 'GET') {
     const index = (await storeGet(INDEX_KEY)) || [];
     return res.status(200).json({ regulations: index });
   }
 
-  /* ââ POST: upload regulation ââ */
+  /* -- POST: upload regulation -- */
   if (req.method === 'POST') {
     const { title, category, issuer, version, text, filename } = req.body;
     if (!title || !text) return res.status(400).json({ error: 'title and text required' });
@@ -85,7 +86,7 @@ export default async function handler(req, res) {
     // Store full regulation data
     await storeSet(dataKey(id), regulation);
 
-    // Update index (metadata only â no fullText/chunks)
+    // Update index (metadata only - no fullText/chunks)
     const index = (await storeGet(INDEX_KEY)) || [];
     index.push({
       id, title,
@@ -101,7 +102,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, id, chunkCount: chunks.length });
   }
 
-  /* ââ DELETE: remove regulation ââ */
+  /* -- DELETE: remove regulation -- */
   if (req.method === 'DELETE') {
     const { id } = req.query;
     if (!id) return res.status(404).json({ error: 'Not found' });
@@ -118,7 +119,7 @@ export default async function handler(req, res) {
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
-/* âââ Helpers âââââââââââââââââââââââââââââââââââââââââââââ */
+/* --- Helpers --------------------------------------------- */
 function chunkText(text, chunkSize = 500) {
   const sentences = text.split(/(?<=[.!?\n])\s+/);
   const chunks = []; let current = ''; let index = 0;
@@ -132,7 +133,7 @@ function chunkText(text, chunkSize = 500) {
   return chunks;
 }
 
-/* âââ Exports for advisory.js âââââââââââââââââââââââââââââ */
+/* --- Exports for advisory.js ----------------------------- */
 export async function getAllRegulations(filterIds) {
   const index = (await storeGet(INDEX_KEY)) || [];
   const ids = filterIds?.length ? index.filter(m => filterIds.includes(m.id)) : index;
@@ -143,3 +144,4 @@ export async function getAllRegulations(filterIds) {
   }
   return regs;
 }
+

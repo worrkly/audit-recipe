@@ -65,6 +65,7 @@ export default async function handler(req, res) {
 
   /* -- POST: upload regulation -- */
   if (req.method === 'POST') {
+    try {
     const { title, category, issuer, version, text, filename } = req.body;
     if (!title || !text) return res.status(400).json({ error: 'title and text required' });
 
@@ -100,6 +101,8 @@ export default async function handler(req, res) {
     await storeSet(INDEX_KEY, index);
 
     return res.status(200).json({ success: true, id, chunkCount: chunks.length });
+  
+    } catch(e) { return res.status(500).json({ error: e.message }); }
   }
 
   /* -- DELETE: remove regulation -- */

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Audit Recipe</title>
+    <style>
+      :root{--bg1:#0a0f1a;--bg2:#111827;--bg3:#1e293b;--ink1:#f1f5f9;--ink2:#94a3b8;--ink3:#64748b;--ink4:#334155;--accent:#6366f1;--accent2:#818cf8;--r:12px}
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg1);color:var(--ink1);min-height:100vh;display:flex;flex-direction:column}
+      nav{background:var(--bg2);border-bottom:1px solid var(--ink4);padding:0 32px;display:flex;align-items:center;height:64px;gap:32px}
+      .nav-brand{font-size:1.25rem;font-weight:700;color:var(--accent2);text-decoration:none}
+      .nav-links{display:flex;gap:8px}
+      .nav-links a{color:var(--ink2);text-decoration:none;padding:8px 16px;border-radius:8px;font-size:.9rem;transition:all .2s}
+      .nav-links a:hover,.nav-links a.active{color:var(--ink1);background:var(--bg3)}
+      main{flex:1;display:flex;justify-content:center;align-items:center;padding:60px 24px}
+      .about-card{background:var(--bg2);border:1px solid var(--ink4);border-radius:var(--r);padding:48px;max-width:520px;width:100%;text-align:center}
+      .avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:2.5rem;font-weight:700;color:#fff}
+      .name{font-size:1.5rem;font-weight:700;margin-bottom:4px}
+      .role{color:var(--accent2);font-size:1rem;margin-bottom:16px}
+      .bio{color:var(--ink2);line-height:1.7;margin-bottom:24px;font-size:.95rem}
+      .divider{height:1px;background:var(--ink4);margin:24px 0}
+      .contact-label{color:var(--ink3);font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+      .contact-link{color:var(--accent2);text-decoration:none;font-size:.95rem}
+      .contact-link:hover{text-decoration:underline}
+      .brand-tag{margin-top:24px;padding-top:24px;border-top:1px solid var(--ink4);color:var(--ink3);font-size:.85rem}
+      .brand-tag strong{color:var(--ink2)}
+      footer{background:var(--bg2);border-top:1px solid var(--ink4);padding:24px 32px;text-align:center}
+      .footer-content{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;flex-wrap:wrap;gap:16px}
+      .footer-links{display:flex;gap:24px}
+      .footer-links a{color:var(--ink3);text-decoration:none;font-size:.85rem}
+      .footer-links a:hover{color:var(--ink2)}
+      .footer-copy{color:var(--ink3);font-size:.85rem}
+    </style>
+</head>
+<body>
+    <nav>
+      <a class="nav-brand" href="/">Audit Recipe</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="compliance-advisory.html">Compliance Advisory</a>
+        <a href="compliance-analyzer.html">Compliance Analyzer</a>
+        <a href="standards-ai.html">Compliance Audit</a>
+        <a href="finding-builder.html">Finding Builder</a>
+        <a href="report-builder.html">Report Builder</a>
+        <a href="about.html" class="active">About</a>
+      </div>
+    </nav>
+    <main>
+      <div class="about-card">
+        <div class="avatar">IA</div>
+        <div class="name">Ibrahim Alobaid</div>
+        <div class="role">Creator & Developer</div>
+        <div class="bio">
+          Audit Recipe is an AI-powered compliance and audit toolkit designed to help professionals streamline regulatory compliance, gap analysis, and audit reporting. Built with a passion for making compliance workflows smarter and more efficient.
+        </div>
+        <div class="divider"></div>
+        <div class="contact-label">Contact</div>
+        <a class="contact-link" href="mailto:ksa-ib@hotmail.com">ksa-ib@hotmail.com</a>
+        <div class="brand-tag">
+          <strong>Audit Recipe</strong> &mdash; Smarter Compliance, Better Audits
+        </div>
+      </div>
+    </main>
+    <footer>
+      <div class="footer-content">
+        <div class="footer-copy">&copy; 2026 Audit Recipe. All rights reserved.</div>
+        <div class="footer-links">
+          <a href="/">Home</a>
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>

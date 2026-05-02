@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Audit Recipe — Admin Dashboard</title>
+  <title>Audit Recipe â Admin Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fustat:wght@700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
@@ -90,7 +90,7 @@
   <a class="nav-logo" href="index.html"><div class="nav-logo-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M5 13V7h6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7v6h-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Audit Recipe</a>
   <span class="admin-badge">ADMIN</span>
   <div class="nav-links">
-    <a class="nav-link" href="index.html">← Home</a>
+    <a class="nav-link" href="index.html">â Home</a>
     <a class="nav-link" href="compliance-advisory.html">Compliance Advisory</a>
     <a class="nav-link" href="standards-ai.html">Compliance Audit</a>
   </div>
@@ -107,10 +107,10 @@
   <div class="tab-content active" id="tab-overview">
     <div class="stats-grid">
       <div class="stat-card"><div class="val" id="statTotal">0</div><div class="lbl">Total Uses</div><div class="sub">All time</div></div>
-      <div class="stat-card"><div class="val" id="statToday">0</div><div class="lbl">Today</div><div class="sub" id="statDate">—</div></div>
-      <div class="stat-card"><div class="val" id="statPopular">—</div><div class="lbl">Most Popular</div><div class="sub">Tool</div></div>
+      <div class="stat-card"><div class="val" id="statToday">0</div><div class="lbl">Today</div><div class="sub" id="statDate">â</div></div>
+      <div class="stat-card"><div class="val" id="statPopular">â</div><div class="lbl">Most Popular</div><div class="sub">Tool</div></div>
       <div class="stat-card"><div class="val" id="statRegs">0</div><div class="lbl">Regulations</div><div class="sub">In database</div></div>
-      <div class="stat-card"><div class="val" id="statPeak">—</div><div class="lbl">Peak Hour</div><div class="sub">Most active</div></div>
+      <div class="stat-card"><div class="val" id="statPeak">â</div><div class="lbl">Peak Hour</div><div class="sub">Most active</div></div>
     </div>
     <div class="tool-breakdown"><h3>Usage by Tool</h3><div id="toolBreakdown"><div style="color:var(--ink3);font-size:13px">Loading...</div></div></div>
     <div class="section-header"><h3>Recent Activity (Last 20)</h3></div>
@@ -135,7 +135,7 @@
   <div class="tab-content" id="tab-regulations">
     <div class="upload-zone" id="uploadZone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave()" ondrop="handleDrop(event)" onclick="document.getElementById('regFile').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <h3>Upload Regulation</h3><p>Drop a PDF, Word document, or text file here</p><span>Supports: .pdf · .docx · .doc · .txt · .md</span>
+      <h3>Upload Regulation</h3><p>Drop a PDF, Word document, or text file here</p><span>Supports: .pdf Â· .docx Â· .doc Â· .txt Â· .md</span>
     </div>
     <input type="file" id="regFile" accept=".pdf,.docx,.doc,.txt,.md" style="display:none" onchange="handleFileSelect(this)"/>
     <div class="upload-form" id="uploadForm">
@@ -185,8 +185,8 @@ async function loadStats(){
     document.getElementById('statTotal').textContent=stats.totalUsage||0;
     document.getElementById('statToday').textContent=todayCount;
     document.getElementById('statDate').textContent=today;
-    document.getElementById('statPeak').textContent=stats.peakHour||'—';
-    document.getElementById('statPopular').textContent=fmtTool(stats.mostPopularTool||'—');
+    document.getElementById('statPeak').textContent=stats.peakHour||'â';
+    document.getElementById('statPopular').textContent=fmtTool(stats.mostPopularTool||'â');
     const bd=stats.toolBreakdown||{};
     const tot=Object.values(bd).reduce((a,b)=>a+b,0)||1;
     const tnames={finding_builder:'Finding Builder',report_builder:'Report Builder',standards_ai:'Compliance Audit',compliance_advisory:'Compliance Advisory',compliance_analyzer:'Compliance Analyzer'};
@@ -194,7 +194,7 @@ async function loadStats(){
       ?Object.entries(bd).sort((a,b)=>b[1]-a[1]).map(([t,c])=>`<div class="tool-row"><span class="tool-name">${tnames[t]||t}</span><div class="tool-bar-wrap"><div class="tool-bar" style="width:${Math.round(c/tot*100)}%"></div></div><span class="tool-count">${c}</span></div>`).join('')
       :'<div style="color:var(--ink3);font-size:13px">No activity yet</div>';
     renderActivityTable((data.entries||[]).slice(0,20),'recentActivity');
-  }catch(e){document.getElementById('statTotal').textContent='—';}
+  }catch(e){document.getElementById('statTotal').textContent='â';}
 }
 async function loadActivity(){
   const tool=document.getElementById('toolFilter')?.value||'';
@@ -210,8 +210,8 @@ function renderActivityTable(entries,id){
   tb.innerHTML=entries.map(e=>{
     const t=new Date(e.timestamp);
     const ts=t.toLocaleDateString()+' '+t.toLocaleTimeString();
-    const ms=Object.entries(e.metadata||{}).map(([k,v])=>k+': '+v).join(' · ');
-    return `<tr><td style="font-size:12px;white-space:nowrap">${ts}</td><td><span class="tool-tag ${e.tool}">${fmtTool(e.tool)}</span></td><td style="font-size:12px;color:var(--ink3)">${e.action}</td><td><span class="ip-text">${e.ip}</span></td><td><span class="meta-text">${ms||'—'}</span></td></tr>`;
+    const ms=Object.entries(e.metadata||{}).map(([k,v])=>k+': '+v).join(' Â· ');
+    return `<tr><td style="font-size:12px;white-space:nowrap">${ts}</td><td><span class="tool-tag ${e.tool}">${fmtTool(e.tool)}</span></td><td style="font-size:12px;color:var(--ink3)">${e.action}</td><td><span class="ip-text">${e.ip}</span></td><td><span class="meta-text">${ms||'â'}</span></td></tr>`;
   }).join('');
 }
 function fmtTool(t){return {finding_builder:'Finding Builder',report_builder:'Report Builder',standards_ai:'Compliance Audit',compliance_advisory:'Compliance Advisory',compliance_analyzer:'Compliance Analyzer'}[t]||t;}
@@ -277,18 +277,22 @@ async function submitUpload(){
   const version=document.getElementById('regVersion').value.trim();
   const category=document.getElementById('regCategory').value;
   if(!title){showToast('Please enter a regulation title','error');return;}
-  if(!pendingText){showToast('No file content to upload','error');return;}
+  if(!pendingText||pendingText.length<20){showToast('No file content to upload (text extraction returned empty)','error');return;}
   document.getElementById('uploadProgress').style.display='block';
   document.getElementById('progressFill').style.width='30%';
   try{
     const r=await fetch('/api/regulations',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':ADMIN_KEY},
       body:JSON.stringify({title,issuer,version,category,text:pendingText,filename:pendingFile?.name})});
-      if(!r.ok){const et=await r.text();throw new Error(et||"Upload failed: "+r.status);}
-    const d=await r.json();
+    let d=null;
+    try{ d=await r.json(); }catch(_){ d=null; }
+    if(!r.ok){
+      const msg=(d&&(d.error||d.message))||('Upload failed: HTTP '+r.status);
+      throw new Error(msg);
+    }
     document.getElementById('progressFill').style.width='100%';
-    if(d.success){showToast('"'+title+'" uploaded — '+d.chunkCount+' chunks indexed','success');cancelUpload();loadRegulations();loadStats();}
-    else showToast('Upload failed: '+(d.error||'Unknown error'),'error');
-  }catch(e){showToast('Error: '+e.message,'error');}
+    if(d&&d.success){showToast('"'+title+'" uploaded â '+d.chunkCount+' chunks indexed','success');cancelUpload();loadRegulations();loadStats();}
+    else showToast('Upload failed: '+((d&&d.error)||'Unknown error'),'error');
+  }catch(e){console.error('Upload error:',e);showToast('Error: '+e.message,'error');}
   document.getElementById('uploadProgress').style.display='none';
 }
 function cancelUpload(){

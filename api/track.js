@@ -1,4 +1,4 @@
-// api/track.js — activity log with Vercel KV persistence
+// api/track.js â activity log with Vercel KV persistence
 import { kv } from '@vercel/kv';
 const KV_KEY = 'activity_log';
 const MAX = 10000;
@@ -28,7 +28,8 @@ export default async function handler(req, res) {
   }
 
   if(req.method==='GET') {
-    if(req.headers['x-admin-key']!==process.env.ADMIN_SECRET) return res.status(401).json({error:'Unauthorized'});
+    const ADMIN_SECRET = process.env.ADMIN_SECRET || 'findingrecipe2026';
+    if(req.headers['x-admin-key']!==ADMIN_SECRET) return res.status(401).json({error:'Unauthorized'});
     const {tool,limit=500,offset=0} = req.query;
     let log = [];
     try { log = (await kv.get(KV_KEY)) || []; } catch(e) { console.error('KV read error:',e); }
